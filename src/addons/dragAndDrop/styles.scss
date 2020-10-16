@@ -37,6 +37,10 @@
     opacity: .50;
   }
 
+  .rbc-addons-dnd-drag-preview {
+    pointer-events: none;
+  }
+
   .rbc-addons-dnd-resizable {
     position: relative;
     width: 100%;

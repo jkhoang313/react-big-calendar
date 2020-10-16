@@ -371,8 +371,10 @@ class Selection {
 
     let { x, y } = this._initialEventData
     const { pageX, pageY } = getEventCoordinates(e)
-    let w = Math.abs(x - pageX)
-    let h = Math.abs(y - pageY)
+    const deltaX = pageX - x
+    const deltaY = pageY - y
+    let w = Math.abs(deltaX)
+    let h = Math.abs(deltaY)
 
     let left = Math.min(pageX, x),
       top = Math.min(pageY, y),
@@ -392,6 +394,8 @@ class Selection {
       y: pageY,
       right: left + w,
       bottom: top + h,
+      deltaX,
+      deltaY,
     }
 
     if (!old) {

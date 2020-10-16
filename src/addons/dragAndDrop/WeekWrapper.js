@@ -21,6 +21,7 @@ const eventTimes = (event, accessors) => {
   if (isZeroDuration) end = dates.add(end, 1, 'day')
   return { start, end }
 }
+const dragFree = true
 
 class WeekWrapper extends React.Component {
   static propTypes = {
@@ -56,30 +57,53 @@ class WeekWrapper extends React.Component {
     this._teardownSelectable()
   }
 
-  reset() {
+  resetSegment() {
     if (this.state.segment) this.setState({ segment: null })
   }
 
-  update(event, start, end) {
+  resetInitialSegment() {
+    if (this.state.initialSegment) this.setState({ initialSegment: null })
+  }
+
+  resetState() {
+    if (this.state.segment || this.state.initialSegment) {
+      this.setState({ segment: null, initialSegment: null })
+    }
+  }
+
+  update(event, start, end, mouseCoordinates) {
     const segment = eventSegments(
       { ...event, end, start, __isPreview: true },
       this.props.slotMetrics.range,
       dragAccessors
     )
 
-    const { segment: lastSegment } = this.state
+    const { segment: lastSegment, initialSegment } = this.state
     if (
       lastSegment &&
       segment.span === lastSegment.span &&
       segment.left === lastSegment.left &&
       segment.right === lastSegment.right
     ) {
-      return
+      if (!dragFree || !initialSegment) {
+        return
+      }
     }
-    this.setState({ segment })
+
+    if (initialSegment) {
+      this.setState({
+        segment,
+        initialSegment: {
+          ...initialSegment,
+          mouseCoordinates,
+        },
+      })
+    } else {
+      this.setState({ segment })
+    }
   }
 
-  handleMove = ({ x, y }, node, draggedEvent) => {
+  handleMove = ({ x, y, deltaX, deltaY }, node, draggedEvent) => {
     const event = this.context.draggable.dragAndDropAction.event || draggedEvent
     const metrics = this.props.slotMetrics
     const { accessors } = this.props
@@ -89,7 +113,18 @@ class WeekWrapper extends React.Component {
     let rowBox = getBoundsForNode(node)
 
     if (!pointInBox(rowBox, { x, y })) {
-      this.reset()
+      const { initialSegment } = this.state
+      if (dragFree && initialSegment) {
+        this.setState({
+          segment: null,
+          initialSegment: {
+            ...initialSegment,
+            mouseCoordinates: { deltaX, deltaY },
+          },
+        })
+      } else {
+        this.resetState()
+      }
       return
     }
 
@@ -105,7 +140,7 @@ class WeekWrapper extends React.Component {
       'minutes'
     )
 
-    this.update(event, start, end)
+    this.update(event, start, end, { deltaX, deltaY })
   }
 
   handleDropFromOutside = (point, rowBox) => {
@@ -144,7 +179,7 @@ class WeekWrapper extends React.Component {
 
     if (direction === 'RIGHT') {
       if (cursorInRow) {
-        if (metrics.last < start) return this.reset()
+        if (metrics.last < start) return this.resetSegment()
         // add min
         end = dates.add(
           metrics.getDateForSlot(
@@ -167,7 +202,7 @@ class WeekWrapper extends React.Component {
     } else if (direction === 'LEFT') {
       // inbetween Row
       if (cursorInRow) {
-        if (metrics.first > end) return this.reset()
+        if (metrics.first > end) return this.resetSegment()
 
         start = metrics.getDateForSlot(
           getSlotAtX(rowBox, point.x, false, metrics.slots)
@@ -178,7 +213,7 @@ class WeekWrapper extends React.Component {
       ) {
         start = dates.add(metrics.first, -1, 'milliseconds')
       } else {
-        this.reset()
+        this.resetSegment()
         return
       }
 
@@ -213,11 +248,37 @@ class WeekWrapper extends React.Component {
       if (dragAndDropAction.action === 'resize') this.handleResize(box, bounds)
     })
 
-    selector.on('selectStart', () => this.context.draggable.onStart())
+    selector.on('selectStart', box => {
+      const bounds = getBoundsForNode(node)
+
+      if (dragFree && pointInBox(bounds, box)) {
+        const event = this.context.draggable.dragAndDropAction.event
+
+        if (event) {
+          this.setState({
+            initialSegment: {
+              ...eventSegments(
+                { ...event, __isPreview: true },
+                this.props.slotMetrics.range,
+                dragAccessors
+              ),
+              mouseCoordinates: { deltaX: 0, deltaY: 0 },
+            },
+          })
+        }
+      }
+
+      this.context.draggable.onStart()
+    })
     selector.on('select', point => {
       const bounds = getBoundsForNode(node)
 
-      if (!this.state.segment || !pointInBox(bounds, point)) return
+      if (!this.state.segment || !pointInBox(bounds, point)) {
+        if (this.state.initialSegment) {
+          this.resetInitialSegment()
+        }
+        return
+      }
       this.handleInteractionEnd()
     })
 
@@ -242,7 +303,7 @@ class WeekWrapper extends React.Component {
     selector.on('click', () => this.context.draggable.onEnd(null))
 
     selector.on('reset', () => {
-      this.reset()
+      this.resetState()
       this.context.draggable.onEnd(null)
     })
   }
@@ -251,7 +312,7 @@ class WeekWrapper extends React.Component {
     const { resourceId, isAllDay } = this.props
     const { event } = this.state.segment
 
-    this.reset()
+    this.resetState()
 
     this.context.draggable.onEnd({
       start: event.start,
@@ -270,24 +331,75 @@ class WeekWrapper extends React.Component {
   render() {
     const { children, accessors } = this.props
 
-    let { segment } = this.state
+    let { segment, initialSegment } = this.state
 
     return (
       <div className="rbc-addons-dnd-row-body">
         {children}
 
         {segment && (
+          <>
+            <EventRow
+              {...this.props}
+              selected={null}
+              className="rbc-addons-dnd-drag-row"
+              segments={[segment]}
+              accessors={{
+                ...accessors,
+                ...dragAccessors,
+              }}
+            />
+          </>
+        )}
+        {initialSegment && (
           <EventRow
             {...this.props}
             selected={null}
             className="rbc-addons-dnd-drag-row"
-            segments={[segment]}
+            segments={[initialSegment]}
             accessors={{
               ...accessors,
               ...dragAccessors,
             }}
+            style={{
+              transform: `translate(${
+                initialSegment.mouseCoordinates.deltaX
+              }px, ${initialSegment.mouseCoordinates.deltaY}px)`,
+            }}
           />
         )}
+        {/* {dragFree ? (
+          initialSegment && (
+            <EventRow
+              {...this.props}
+              selected={null}
+              className="rbc-addons-dnd-drag-row"
+              segments={[initialSegment]}
+              accessors={{
+                ...accessors,
+                ...dragAccessors,
+              }}
+              style={{
+                transform: `translate(${initialSegment.mouseCoordinates.deltaX}px, ${
+                  initialSegment.mouseCoordinates.deltaY
+                }px)`,
+              }}
+            />
+          )
+        ) : (
+          segment && (
+            <EventRow
+              {...this.props}
+              selected={null}
+              className="rbc-addons-dnd-drag-row"
+              segments={[segment]}
+              accessors={{
+                ...accessors,
+                ...dragAccessors,
+              }}
+            />
+          )
+        )} */}
       </div>
     )
   }
