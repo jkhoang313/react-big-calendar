@@ -35,21 +35,24 @@ export function monthsInYear(year) {
   return MONTHS.map(i => dates.month(date, i))
 }
 
-export function firstVisibleDay(date, localizer) {
-  let firstOfMonth = dates.startOf(date, 'month')
+export function firstVisibleDay(date, localizer, infiniteScroll = false) {
+  const beginDate = dates.subtract(date, infiniteScroll ? 8 : 0, 'week')
+  const firstOfMonth = dates.startOf(beginDate, 'month')
 
   return dates.startOf(firstOfMonth, 'week', localizer.startOfWeek())
 }
 
-export function lastVisibleDay(date, localizer) {
-  let endOfMonth = dates.endOf(date, 'month')
+export function lastVisibleDay(date, localizer, infiniteScroll = false) {
+  const lastDayOfMonth = dates.endOf(date, 'month')
+  const endDate = dates.add(lastDayOfMonth, infiniteScroll ? 8 : 0, 'week')
+  const endOfMonth = dates.endOf(endDate, 'month')
 
   return dates.endOf(endOfMonth, 'week', localizer.startOfWeek())
 }
 
-export function visibleDays(date, localizer) {
-  let current = firstVisibleDay(date, localizer),
-    last = lastVisibleDay(date, localizer),
+export function visibleDays(date, localizer, infiniteScroll) {
+  let current = firstVisibleDay(date, localizer, infiniteScroll),
+    last = lastVisibleDay(date, localizer, infiniteScroll),
     days = []
 
   while (dates.lte(current, last, 'day')) {

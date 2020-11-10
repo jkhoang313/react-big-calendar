@@ -25,6 +25,7 @@ import CustomView from './demos/customView'
 import Resource from './demos/resource'
 import DndResource from './demos/dndresource'
 import Timeslots from './demos/timeslots'
+import InfiniteScroll from './demos/infiniteScroll'
 import Dnd from './demos/dnd'
 import DndOutsideSource from './demos/dndOutsideSource'
 import Dropdown from 'react-bootstrap/lib/Dropdown'
@@ -45,6 +46,7 @@ const EXAMPLES = {
   rendering: 'Customized Component Rendering',
   customView: 'Custom Calendar Views',
   resource: 'Resource Scheduling',
+  infiniteScroll: 'Infinite Scroll',
   dnd: 'Addon: Drag and drop',
   dndresource: 'Resource Drag and drop',
   dndOutsideSource: 'Addon: Drag and drop (from outside calendar)',
@@ -81,6 +83,7 @@ class Example extends React.Component {
       customView: CustomView,
       resource: Resource,
       timeslots: Timeslots,
+      infiniteScroll: InfiniteScroll,
       dnd: Dnd,
       dndresource: DndResource,
       dndOutsideSource: DndOutsideSource,
