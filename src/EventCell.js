@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import clsx from 'clsx'
 import * as dates from './utils/dates'
+import moment from 'moment'
 
 class EventCell extends React.Component {
   render() {
@@ -39,7 +40,11 @@ class EventCell extends React.Component {
     let userProps = getters.eventProp(event, start, end, selected)
 
     const content = (
-      <div className="rbc-event-content" title={tooltip || undefined}>
+      <div
+        className="rbc-event-content"
+        title={tooltip || undefined}
+        onClick={() => console.log('hi')}
+      >
         {Event ? (
           <Event
             event={event}

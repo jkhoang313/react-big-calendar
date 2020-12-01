@@ -5,6 +5,7 @@ import clsx from 'clsx'
 
 import * as dates from './utils/dates'
 import chunk from 'lodash/chunk'
+import debounce from 'lodash/debounce'
 
 import { navigate, views } from './utils/constants'
 import { notify } from './utils/helpers'
@@ -23,15 +24,24 @@ let eventsForWeek = (evts, start, end, accessors) =>
   evts.filter(e => inRange(e, start, end, accessors))
 
 class MonthView extends React.Component {
-  constructor(...args) {
-    super(...args)
+  constructor(props) {
+    super(props)
 
     this._bgRows = []
     this._pendingSelection = []
     this.slotRowRef = React.createRef()
+    this.scrollContainer = React.createRef()
+    this.currentMonthStartingRow = React.createRef()
+    this.currentMonthEndingRow = React.createRef()
     this.state = {
       rowLimit: 5,
       needLimitMeasure: true,
+      visibleDays: dates.visibleDays(
+        props.date,
+        props.localizer,
+        props.infiniteScroll
+      ),
+      preventNewVisibleDays: false,
     }
   }
 
@@ -58,10 +68,23 @@ class MonthView extends React.Component {
       }),
       false
     )
+
+    if (this.props.infiniteScroll) {
+      this.scrollToCurrentMonth()
+    }
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
+    const { date, localizer, infiniteScroll } = this.props
+
     if (this.state.needLimitMeasure) this.measureRowLimit(this.props)
+
+    // if (prevProps.date !== date) {
+    //   this.setState({
+    //     visibleDays: dates.visibleDays(date, localizer, infiniteScroll),
+    //   })
+    // }
+    // Check that enough weeks are rendered
   }
 
   componentWillUnmount() {
@@ -72,20 +95,106 @@ class MonthView extends React.Component {
     return findDOMNode(this)
   }
 
-  render() {
-    let { date, localizer, className } = this.props,
-      month = dates.visibleDays(date, localizer),
-      weeks = chunk(month, 7)
+  scrollToCurrentMonth = () => {
+    const scrollContainer = this.scrollContainer.current
+    // console.log(this.currentMonthStartingRow.current)
+    // console.log(dates.firstVisibleDay(this.props.date, this.props.localizer))
+    // const rows = month.getElementsByClassName('rbc-month-row')
+    // const rowHeight = rows[0].offsetHeight
+    // setTimeout(() => {
+    // console.log('this', scrollContainer.getElementsByClassName('rbc-month-row')[0].offsetTop)
+    // console.log('this', scrollContainer.getElementsByClassName('rbc-month-row')[1].offsetTop)
+    // console.log('this', scrollContainer.getElementsByClassName('rbc-month-row')[2].offsetTop)
+    // scrollContainer.scrollTop = scrollContainer.getElementsByClassName('rbc-month-row')[9].offsetTop
+    // }, 2000)
+  }
 
+  handleScroll = e => {
+    this.checkRenderWeeks(e.target)
+    this.checkCurrentMonth(e.target)
+  }
+
+  checkRenderWeeks = node => {
+    //  if (scrollDistanceTop < scrollThreshold) {
+    //     // console.log('render top weeks')
+    //     // this.props.onNavigate('PREV')
+    //     // this.setState({
+    //     //   scrollY: scrollPos + diff,
+    //     // })
+    //   } else if (scrollThresholdBottom > currentCenterDistance) {
+    //     console.log('render bottom weeks')
+    //     // this.setState({})
+    //     // this.props.onNavigate('NEXT')
+    //     // this.setState({
+    //     //   scrollY: scrollPos - diff,
+    //     // })
+    //   }
+  }
+
+  checkCurrentMonth = debounce(node => {
+    const rows = node.getElementsByClassName('rbc-month-row')
+    if (rows.length) {
+      // Need to account for variable row heights
+      const rowHeight = rows[0].offsetHeight
+      const totalRows = rows.length
+      const scrollContainerHeight = node.offsetHeight
+      const scrollDistanceTop = node.scrollTop
+      // scrollDistance bottom doesn't account for variable row heights
+      const scrollDistanceBottom =
+        totalRows * rowHeight - scrollDistanceTop - scrollContainerHeight
+      // Ensure at least 6 weeks before and after are loaded
+      // for smooth experience
+      const scrollThreshold = rowHeight * 6
+      const currentCenterDistance =
+        scrollDistanceTop + scrollContainerHeight / 2
+      const topOfCurrentMonth = this.currentMonthStartingRow.current.offsetTop
+      const bottomOfCurrentMonth =
+        this.currentMonthEndingRow.current.offsetTop +
+        this.currentMonthEndingRow.current.offsetHeight
+
+      const scrollThresholdBottom = rows[totalRows - 7]
+      console.log(currentCenterDistance)
+      console.log(scrollThresholdBottom.offsetTop)
+
+      if (currentCenterDistance < topOfCurrentMonth) {
+        console.log('prev')
+        this.props.onNavigate('PREV')
+      } else if (currentCenterDistance > bottomOfCurrentMonth) {
+        console.log('next')
+        this.props.onNavigate('NEXT')
+      }
+    }
+  }, 50)
+
+  render() {
+    let { date, localizer, className, infiniteScroll } = this.props,
+      { visibleDays } = this.state,
+      weeks = chunk(visibleDays, 7)
     this._weekCount = weeks.length
+    // console.log(this.state)
 
     return (
-      <div className={clsx('rbc-month-view', className)}>
+      <div
+        className={clsx(
+          'rbc-month-view',
+          infiniteScroll && 'rbc-month-view-infinite'
+        )}
+      >
         <div className="rbc-row rbc-month-header">
           {this.renderHeaders(weeks[0])}
         </div>
-        {weeks.map(this.renderWeek)}
-        {this.props.popup && this.renderOverlay()}
+        <div
+          className={clsx(
+            'rbc-month-rows-container',
+            className,
+            infiniteScroll && 'rbc-month-rows-container-infinite'
+          )}
+          onScroll={this.handleScroll}
+          ref={this.scrollContainer}
+        >
+          {weeks.map(this.renderWeek)}
+          {this.props.popup && this.renderOverlay()}
+        </div>
       </div>
     )
   }
@@ -102,6 +211,7 @@ class MonthView extends React.Component {
       longPressThreshold,
       accessors,
       getters,
+      infiniteScroll,
     } = this.props
 
     const { needLimitMeasure, rowLimit } = this.state
@@ -110,17 +220,30 @@ class MonthView extends React.Component {
 
     events.sort((a, b) => sortEvents(a, b, accessors))
 
+    const dateStartOfMonth = dates.startOf(date, 'month')
+    const dateEndOfMonth = dates.endOf(date, 'month')
+    const rowStartOfweek = week[0]
+    let scrollRef
+    if (dates.eq(dateStartOfMonth, rowStartOfweek, 'week')) {
+      scrollRef = this.currentMonthStartingRow
+    } else if (dates.eq(dateEndOfMonth, rowStartOfweek, 'week')) {
+      scrollRef = this.currentMonthEndingRow
+    }
+
     return (
       <DateContentRow
-        key={weekIdx}
-        ref={weekIdx === 0 ? this.slotRowRef : undefined}
+        key={week[0].toString()}
+        scrollRef={scrollRef}
         container={this.getContainer}
-        className="rbc-month-row"
+        className={clsx(
+          'rbc-month-row',
+          infiniteScroll && 'rbc-month-row-infinite'
+        )}
         getNow={getNow}
         date={date}
         range={week}
         events={events}
-        maxRows={rowLimit}
+        maxRows={Infinity}
         selected={selected}
         selectable={selectable}
         components={components}
@@ -233,7 +356,7 @@ class MonthView extends React.Component {
   measureRowLimit() {
     this.setState({
       needLimitMeasure: false,
-      rowLimit: this.slotRowRef.current.getRowLimit(),
+      // rowLimit: this.slotRowRef.current.getRowLimit(),
     })
   }
 
@@ -315,6 +438,7 @@ class MonthView extends React.Component {
 MonthView.propTypes = {
   events: PropTypes.array.isRequired,
   date: PropTypes.instanceOf(Date),
+  infiniteScroll: PropTypes.bool,
 
   min: PropTypes.instanceOf(Date),
   max: PropTypes.instanceOf(Date),
@@ -358,8 +482,9 @@ MonthView.propTypes = {
 }
 
 MonthView.range = (date, { localizer }) => {
-  let start = dates.firstVisibleDay(date, localizer)
-  let end = dates.lastVisibleDay(date, localizer)
+  const { infiniteScroll } = this.props
+  let start = dates.firstVisibleDay(date, localizer, infiniteScroll)
+  let end = dates.lastVisibleDay(date, localizer, infiniteScroll)
   return { start, end }
 }
 

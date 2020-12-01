@@ -10,6 +10,7 @@ class EventRow extends React.Component {
       slotMetrics: { slots },
       className,
     } = this.props
+    console.log('segments', segments)
 
     let lastEnd = 1
 

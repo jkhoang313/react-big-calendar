@@ -130,7 +130,7 @@
   "dependencies": {
     "@babel/runtime": "^7.1.5",
     "clsx": "^1.0.4",
-    "date-arithmetic": "^4.0.1",
+    "date-arithmetic": "^3.1.0",
     "dom-helpers": "^5.1.0",
     "invariant": "^2.2.4",
     "lodash": "^4.17.11",
@@ -147,6 +147,5 @@
     "url": "https://github.com/jquense/react-big-calendar/issues"
   },
   "readme": "ERROR: No README data found!",
-  "homepage": "https://github.com/jquense/react-big-calendar#readme",
-  "_id": "react-big-calendar@0.22.1"
+  "homepage": "https://github.com/jquense/react-big-calendar#readme"
 }

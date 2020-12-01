@@ -100,22 +100,23 @@ class Dnd extends React.Component {
   render() {
     return (
       <DragAndDropCalendar
-        selectable
+        // selectable
         localizer={this.props.localizer}
         events={this.state.events}
         onEventDrop={this.moveEvent}
         resizable
-        onEventResize={this.resizeEvent}
+        onEventResize={console.log}
         onSelectSlot={this.newEvent}
-        onDragStart={console.log}
+        onDragStart={() => {}}
         defaultView={Views.MONTH}
-        defaultDate={new Date(2015, 3, 12)}
+        defaultDate={new Date(2015, 3, 1)}
         popup={true}
         dragFromOutsideItem={
           this.state.displayDragItemInCell ? this.dragFromOutsideItem : null
         }
         onDropFromOutside={this.onDropFromOutside}
         handleDragStart={this.handleDragStart}
+        infiniteScroll={true}
       />
     )
   }

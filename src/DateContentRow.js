@@ -142,7 +142,7 @@ class DateContentRow extends React.Component {
     }
 
     return (
-      <div className={className}>
+      <div className={className} ref={this.props.scrollRef}>
         <BackgroundCells
           date={date}
           getNow={getNow}
