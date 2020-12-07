@@ -85,6 +85,7 @@ class MonthView extends React.Component {
       <div
         className={clsx(
           'rbc-month-view',
+          className,
           scrollableMonth && 'rbc-month-view-infinite'
         )}
       >
@@ -94,11 +95,8 @@ class MonthView extends React.Component {
         <div
           className={clsx(
             'rbc-month-rows-container',
-            className,
             scrollableMonth && 'rbc-month-rows-container-infinite'
           )}
-          onScroll={this.handleScroll}
-          ref={this.scrollContainer}
         >
           {weeks.map(this.renderWeek)}
           {this.props.popup && this.renderOverlay()}
