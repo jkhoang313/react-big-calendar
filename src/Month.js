@@ -14,6 +14,7 @@ import * as animationFrame from 'dom-helpers/animationFrame'
 import Popup from './Popup'
 import Overlay from 'react-overlays/Overlay'
 import DateContentRow from './DateContentRow'
+import ExpandContentRow from './ExpandContentRow'
 import Header from './Header'
 import DateHeader from './DateHeader'
 
@@ -73,11 +74,11 @@ class MonthView extends React.Component {
   }
 
   render() {
-    let { date, localizer, className, infiniteScroll } = this.props,
+    let { date, localizer, className, infiniteScroll, expandRow } = this.props,
       month = dates.visibleDays(date, localizer),
       weeks = chunk(month, 7)
 
-    const scrollableMonth = infiniteScroll
+    const scrollableMonth = infiniteScroll || expandRow
     this._weekCount = weeks.length
 
     return (
@@ -120,9 +121,10 @@ class MonthView extends React.Component {
       getters,
       showAllEvents,
       infiniteScroll,
+      expandRow,
     } = this.props
 
-    const flexibleRowHeight = infiniteScroll
+    const flexibleRowHeight = infiniteScroll || expandRow
 
     const renderAllEvents = showAllEvents || flexibleRowHeight
 
@@ -132,7 +134,7 @@ class MonthView extends React.Component {
 
     events.sort((a, b) => sortEvents(a, b, accessors))
 
-    return (
+    const rowContainer = (
       <DateContentRow
         key={weekIdx}
         ref={weekIdx === 0 ? this.slotRowRef : undefined}
@@ -165,6 +167,10 @@ class MonthView extends React.Component {
         showAllEvents={showAllEvents}
       />
     )
+
+    if (expandRow) {
+      return <ExpandContentRow key={weekIdx}>{rowContainer}</ExpandContentRow>
+    } else return rowContainer
   }
 
   readerDateHeading = ({ date, className, ...props }) => {
@@ -374,6 +380,7 @@ MonthView.propTypes = {
   getDrilldownView: PropTypes.func.isRequired,
 
   popup: PropTypes.bool,
+  expandRow: PropTypes.bool,
   handleDragStart: PropTypes.func,
 
   popupOffset: PropTypes.oneOfType([
