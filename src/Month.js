@@ -84,36 +84,33 @@ class MonthView extends React.Component {
 
     const style = scrollableMonth
       ? {
-          'margin-right': `${scrollbarSize() - 1}px`,
-          'border-right': '1px solid #DDD',
+          marginRight: `${scrollbarSize() - 1}px`,
+          borderRight: '1px solid #DDD',
         }
       : {}
 
+    const renderWeekWithHeight = (week, weekIdx) =>
+      this.renderWeek(week, weekIdx, weeks.length)
+
     return (
-      <div
-        className={clsx(
-          'rbc-month-view',
-          className,
-          scrollableMonth && 'rbc-month-view-infinite'
-        )}
-      >
+      <div className={clsx('rbc-month-view', className)}>
         <div className="rbc-row rbc-month-header" style={style}>
           {this.renderHeaders(weeks[0])}
         </div>
         <div
           className={clsx(
             'rbc-month-rows-container',
-            scrollableMonth && 'rbc-month-rows-container-infinite'
+            scrollableMonth && 'rbc-month-rows-container-scrollable'
           )}
         >
-          {weeks.map(this.renderWeek)}
+          {weeks.map(renderWeekWithHeight)}
           {this.props.popup && this.renderOverlay()}
         </div>
       </div>
     )
   }
 
-  renderWeek = (week, weekIdx) => {
+  renderWeek = (week, weekIdx, numOfWeeks = 5) => {
     let {
       events,
       components,
@@ -148,7 +145,7 @@ class MonthView extends React.Component {
         container={this.getContainer}
         className={clsx(
           'rbc-month-row',
-          flexibleRowHeight && 'rbc-month-row-infinite'
+          flexibleRowHeight && 'rbc-month-row-full'
         )}
         getNow={getNow}
         date={date}
@@ -172,11 +169,18 @@ class MonthView extends React.Component {
         rtl={this.props.rtl}
         resizable={this.props.resizable}
         showAllEvents={showAllEvents}
+        style={{
+          minHeight: `${100 / numOfWeeks}%`,
+        }}
       />
     )
 
     if (expandRow) {
-      return <ExpandContentRow key={weekIdx}>{rowContainer}</ExpandContentRow>
+      return (
+        <ExpandContentRow key={date.toString() + weekIdx}>
+          {rowContainer}
+        </ExpandContentRow>
+      )
     } else return rowContainer
   }
 
