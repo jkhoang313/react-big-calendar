@@ -179,7 +179,7 @@ class MonthView extends React.Component {
 
     if (expandRow) {
       return (
-        <ExpandContentRow key={date.getTime() + weekIdx}>
+        <ExpandContentRow key={week[0].getTime() + weekIdx}>
           {rowContainer}
         </ExpandContentRow>
       )
