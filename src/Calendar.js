@@ -728,24 +728,6 @@ class Calendar extends React.Component {
     }),
 
     /**
-     * Provide custom props to custom components.
-     * The name of the key should match the name of the
-     * custom component.
-     * ```jsx
-     * let componentProps = {
-     *   toolbar: {
-     *    customToolbarProp1: value1,
-     *    customToolbarProp2: value2,
-     *   }
-     * }
-     * <Calendar componentProps={componentProps} />
-     * ```
-     */
-    componentProps: PropTypes.shape({
-      toolbar: PropTypes.object,
-    }),
-
-    /**
      * String messages used throughout the component, override to provide localizations
      */
     messages: PropTypes.shape({
@@ -828,7 +810,6 @@ class Calendar extends React.Component {
     culture,
     messages = {},
     components = {},
-    componentProps = {},
     formats = {},
   }) {
     let names = viewNames(views)
@@ -852,7 +833,6 @@ class Calendar extends React.Component {
         weekWrapper: NoopWrapper,
         timeSlotWrapper: NoopWrapper,
       }),
-      componentProps: componentProps,
       accessors: {
         start: wrapAccessor(startAccessor),
         end: wrapAccessor(endAccessor),
@@ -917,7 +897,6 @@ class Calendar extends React.Component {
       formats: _1,
       messages: _2,
       culture: _3,
-      componentProps: _4,
       ...props
     } = this.props
 
@@ -927,7 +906,6 @@ class Calendar extends React.Component {
     const {
       accessors,
       components,
-      componentProps,
       getters,
       localizer,
       viewNames,
@@ -944,7 +922,6 @@ class Calendar extends React.Component {
       >
         {toolbar && (
           <CalToolbar
-            {...componentProps.toolbar}
             date={current}
             view={view}
             views={viewNames}
