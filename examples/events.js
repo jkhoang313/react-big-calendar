@@ -80,6 +80,7 @@ export default [
     title: 'Birthday Party',
     start: new Date(2015, 3, 13, 7, 0, 0),
     end: new Date(2015, 3, 13, 10, 30, 0),
+    renderTop: true,
   },
   {
     id: 12,
@@ -116,6 +117,7 @@ export default [
     title: 'Video Record',
     start: new Date(2015, 3, 14, 15, 30, 0),
     end: new Date(2015, 3, 14, 19, 0, 0),
+    allDay: true,
   },
   {
     id: 17,
@@ -134,6 +136,7 @@ export default [
     title: 'Online Coding Test',
     start: new Date(2015, 3, 14, 17, 30, 0),
     end: new Date(2015, 3, 14, 20, 30, 0),
+    renderTop: true,
   },
   {
     id: 20,
@@ -152,11 +155,13 @@ export default [
     title: 'Cooking Class',
     start: new Date(2015, 3, 14, 17, 30, 0),
     end: new Date(2015, 3, 14, 19, 0, 0),
+    allDay: true,
   },
   {
     id: 23,
     title: 'Go to the gym',
     start: new Date(2015, 3, 14, 18, 30, 0),
     end: new Date(2015, 3, 14, 20, 0, 0),
+    renderTop: true,
   },
 ]

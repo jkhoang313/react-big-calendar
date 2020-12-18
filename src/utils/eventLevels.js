@@ -134,3 +134,27 @@ export function sortEvents(evtA, evtB, accessors, customSorting = {}) {
   }
   return 0
 }
+export function sortEvents2(evtA, evtB, accessors) {
+  let startSort =
+    +dates.startOf(accessors.start(evtA), 'day') -
+    +dates.startOf(accessors.start(evtB), 'day')
+
+  let durA = dates.diff(
+    accessors.start(evtA),
+    dates.ceil(accessors.end(evtA), 'day'),
+    'day'
+  )
+
+  let durB = dates.diff(
+    accessors.start(evtB),
+    dates.ceil(accessors.end(evtB), 'day'),
+    'day'
+  )
+
+  return (
+    startSort || // sort by start Day first
+    Math.max(durB, 1) - Math.max(durA, 1) || // events spanning multiple days go first
+    !!accessors.allDay(evtB) - !!accessors.allDay(evtA) || // then allDay single day events
+    +accessors.start(evtA) - +accessors.start(evtB)
+  ) // then sort by start time
+}

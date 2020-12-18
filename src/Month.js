@@ -20,7 +20,7 @@ import ExpandContentRow from './ExpandContentRow'
 import Header from './Header'
 import DateHeader from './DateHeader'
 
-import { inRange, sortEvents } from './utils/eventLevels'
+import { inRange, sortEvents, sortEvents2 } from './utils/eventLevels'
 
 let eventsForWeek = (evts, start, end, accessors) =>
   evts.filter(e => inRange(e, start, end, accessors))
@@ -192,47 +192,92 @@ class MonthView extends React.Component {
 
     events = eventsForWeek(events, week[0], week[week.length - 1], accessors)
 
-    events.sort((a, b) => sortEvents(a, b, accessors, customSorting))
+    events.sort((a, b) =>
+      sortEvents(a, b, accessors, {
+        sortPriority: [
+          'checkItems',
+          'startDay',
+          'duration',
+          'allDay',
+          'startTime',
+        ],
+        customComparators: {
+          checkItems: (evtA, evtB) => !!evtB.renderTop - !!evtA.renderTop,
+        },
+      })
+    )
     const style = {
       minHeight: `${100 / numOfWeeks}%`,
     }
 
     const rowContainer = (
-      <DateContentRow
-        key={weekIdx}
-        ref={weekIdx === 0 ? this.slotRowRef : undefined}
-        container={this.getContainer}
-        className={clsx(
-          'rbc-month-row',
-          flexibleRowHeight && 'rbc-month-row-full'
-        )}
-        getNow={getNow}
-        date={date}
-        range={week}
-        events={events}
-        maxRows={renderAllEvents ? Infinity : rowLimit}
-        selected={selected}
-        selectable={selectable}
-        components={components}
-        accessors={accessors}
-        getters={getters}
-        localizer={localizer}
-        renderHeader={this.readerDateHeading}
-        renderForMeasure={needLimitMeasure}
-        onShowMore={this.handleShowMore}
-        onSelect={this.handleSelectEvent}
-        onDoubleClick={this.handleDoubleClickEvent}
-        onKeyPress={this.handleKeyPressEvent}
-        onSelectSlot={this.handleSelectSlot}
-        longPressThreshold={longPressThreshold}
-        rtl={this.props.rtl}
-        resizable={this.props.resizable}
-        showAllEvents={showAllEvents}
-        style={style}
-        slideRight={slideRight}
-        animation={true}
-        renderAllEvents={renderAllEvents}
-      />
+      <div
+        onClick={() => {
+          const eventsCloneOne = events.slice()
+          const eventsCloneTwo = events.slice()
+          const eventsSortOne = eventsCloneOne.sort((a, b) =>
+            sortEvents(a, b, accessors, {
+              sortPriority: [
+                'checkItems',
+                'startDay',
+                'duration',
+                'allDay',
+                'startTime',
+              ],
+              customComparators: {
+                checkItems: (evtA, evtB) => !!evtB.renderTop - !!evtA.renderTop,
+              },
+            })
+          )
+          const eventsSortTwo = eventsCloneTwo.sort((a, b) =>
+            sortEvents2(a, b, accessors)
+          )
+          // console.log(eventsSortOne.every((event, index) => event.id === eventsSortTwo[index].id))
+
+          // var iterations = 100;
+          // console.time('Function #1');
+          // for(var i = 0; i < iterations; i++ ){
+          //   eventsCloneOne.sort((a, b) => sortEvents(a, b, accessors));
+          // };
+          // console.timeEnd('Function #1')
+        }}
+      >
+        <DateContentRow
+          key={weekIdx}
+          ref={weekIdx === 0 ? this.slotRowRef : undefined}
+          container={this.getContainer}
+          className={clsx(
+            'rbc-month-row',
+            flexibleRowHeight && 'rbc-month-row-full'
+          )}
+          getNow={getNow}
+          date={date}
+          range={week}
+          events={events}
+          maxRows={renderAllEvents ? Infinity : rowLimit}
+          selected={selected}
+          selectable={selectable}
+          components={components}
+          accessors={accessors}
+          getters={getters}
+          localizer={localizer}
+          renderHeader={this.readerDateHeading}
+          renderForMeasure={needLimitMeasure}
+          onShowMore={this.handleShowMore}
+          onSelect={this.handleSelectEvent}
+          onDoubleClick={this.handleDoubleClickEvent}
+          onKeyPress={this.handleKeyPressEvent}
+          onSelectSlot={this.handleSelectSlot}
+          longPressThreshold={longPressThreshold}
+          rtl={this.props.rtl}
+          resizable={this.props.resizable}
+          showAllEvents={showAllEvents}
+          style={style}
+          slideRight={slideRight}
+          animation={true}
+          renderAllEvents={renderAllEvents}
+        />
+      </div>
     )
 
     if (expandRow) {
