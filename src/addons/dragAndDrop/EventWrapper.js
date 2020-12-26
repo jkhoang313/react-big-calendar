@@ -169,6 +169,7 @@ class EventWrapper extends React.Component {
           children.props.className,
           'rbc-addons-dnd-dragged-event'
         )
+        // console.log('draggable', draggable)
       }
 
       children = React.cloneElement(children, newProps)

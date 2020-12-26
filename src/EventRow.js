@@ -4,11 +4,23 @@ import React from 'react'
 import EventRowMixin from './EventRowMixin'
 
 class EventRow extends React.Component {
+  static contextTypes = {
+    draggable: PropTypes.shape({
+      onStart: PropTypes.func,
+      onEnd: PropTypes.func,
+      dragAndDropAction: PropTypes.object,
+      onDropFromOutside: PropTypes.func,
+      onBeginAction: PropTypes.func,
+      dragFromOutsideItem: PropTypes.func,
+    }),
+  }
+
   render() {
     let {
       segments,
       slotMetrics: { slots },
       className,
+      previewSpan,
     } = this.props
 
     let lastEnd = 1
@@ -16,6 +28,10 @@ class EventRow extends React.Component {
     return (
       <div className={clsx(className, 'rbc-row')}>
         {segments.reduce((row, { event, left, right, span }, li) => {
+          // if (event.__isPreview) {
+          //   console.log(event)
+          // }
+
           let key = '_lvl_' + li
           let gap = left - lastEnd
 
@@ -23,7 +39,15 @@ class EventRow extends React.Component {
 
           if (gap) row.push(EventRowMixin.renderSpan(slots, gap, `${key}_gap`))
 
-          row.push(EventRowMixin.renderSpan(slots, span, key, content))
+          if (
+            this.context.draggable.dragAndDropAction.interacting && // if an event is being dragged right now
+            this.context.draggable.dragAndDropAction.event === event && // and it's the current event
+            previewSpan
+          ) {
+            row.push(EventRowMixin.renderSpan(slots, previewSpan, key, content))
+          } else {
+            row.push(EventRowMixin.renderSpan(slots, span, key, content))
+          }
 
           lastEnd = right + 1
 

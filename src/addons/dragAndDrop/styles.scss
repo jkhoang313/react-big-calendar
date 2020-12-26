@@ -30,7 +30,7 @@
   }
 
   .rbc-addons-dnd-dragged-event {
-    opacity: 0;
+    // opacity: 0;
   }
 
   &.rbc-addons-dnd-is-dragging .rbc-event:not(.rbc-addons-dnd-dragged-event):not(.rbc-addons-dnd-drag-preview) {

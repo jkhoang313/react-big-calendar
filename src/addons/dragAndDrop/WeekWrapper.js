@@ -392,12 +392,24 @@ class WeekWrapper extends React.Component {
     const { children, accessors } = this.props
 
     let { segment } = this.state
+    // console.log('children', children)
+    let newProps = {}
+    if (segment) {
+      newProps.previewSpan = segment.span
+    }
+    const child = React.cloneElement(children)
+    const childrenWithProps = React.Children.map(children, (child, index) => {
+      if (React.isValidElement(child)) {
+        return React.cloneElement(child, newProps)
+      }
+      return child
+    })
 
     return (
       <div className="rbc-addons-dnd-row-body">
-        {children}
+        {childrenWithProps}
 
-        {segment && (
+        {/* {segment && (
           <EventRow
             {...this.props}
             selected={null}
@@ -408,7 +420,7 @@ class WeekWrapper extends React.Component {
               ...dragAccessors,
             }}
           />
-        )}
+        )} */}
       </div>
     )
   }
