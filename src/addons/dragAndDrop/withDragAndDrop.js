@@ -131,6 +131,7 @@ export default function withDragAndDrop(Calendar) {
         interacting: false,
         direction: null,
         hoveredDateRange: null,
+        actionOriginalDate: null,
       }
 
       this.state = this.initialState
@@ -164,8 +165,13 @@ export default function withDragAndDrop(Calendar) {
       }
     }
 
-    handleInteractionStart = () => {
-      if (this.state.interacting === false) this.setState({ interacting: true })
+    handleInteractionStart = (actionOriginalDate = null) => {
+      if (this.state.interacting === false) {
+        this.setState({
+          interacting: true,
+          actionOriginalDate,
+        })
+      }
     }
 
     handleInteractionEnd = interactionInfo => {

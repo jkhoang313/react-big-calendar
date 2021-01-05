@@ -91,7 +91,9 @@ class WeekWrapper extends React.Component {
   }
 
   handleMove = ({ x, y }, node, draggedEvent) => {
-    const event = this.context.draggable.dragAndDropAction.event || draggedEvent
+    const { dragAndDropAction } = this.context.draggable
+    const { actionOriginalDate } = dragAndDropAction
+    const event = dragAndDropAction.event || draggedEvent
     const metrics = this.props.slotMetrics
     const { accessors } = this.props
 
@@ -101,13 +103,35 @@ class WeekWrapper extends React.Component {
 
     if (!pointInBox(rowBox, { x, y })) {
       this.resetSegment()
+
+      // If we are dragging off the calendar grid, set to the
+      // original segment/initial event
+      const withinGridWidth = pointInColumn(rowBox, x)
+      if (
+        !withinGridWidth &&
+        actionOriginalDate &&
+        dates.inRange(
+          actionOriginalDate,
+          metrics.first,
+          dates.add(metrics.last, -1, 'milliseconds')
+        )
+      ) {
+        this.resetToInitialEvent()
+      }
       return
     }
 
-    // Make sure to maintain the time of the start date while moving it to the new slot
-    let start = dates.merge(
-      metrics.getDateForSlot(getSlotAtX(rowBox, x, false, metrics.slots)),
-      accessors.start(event)
+    // Make sure to maintain the time of the start date while moving it to the new slot.
+    // Also, ensure that when we drag from the middle of the event,
+    // we don't automatically set the current date slot as the
+    // start of the event.
+    const currentSlotDate = metrics.getDateForSlot(
+      getSlotAtX(rowBox, x, false, metrics.slots)
+    )
+    let start = dates.add(
+      currentSlotDate,
+      -dates.diff(accessors.start(event), actionOriginalDate, 'minutes'),
+      'minutes'
     )
 
     let end = dates.add(
@@ -318,7 +342,11 @@ class WeekWrapper extends React.Component {
       if (dragAndDropAction.action === 'resize') this.handleResize(box, bounds)
     })
 
-    selector.on('selectStart', () => this.context.draggable.onStart())
+    selector.on('selectStart', box => {
+      const bounds = getBoundsForNode(node)
+      this.handleInteractionStart(box, bounds)
+    })
+
     selector.on('select', point => {
       const bounds = getBoundsForNode(node)
 
@@ -353,6 +381,21 @@ class WeekWrapper extends React.Component {
       this.resetState()
       this.context.draggable.onEnd(null)
     })
+  }
+
+  handleInteractionStart = ({ x, y }, node) => {
+    const { dragAndDropAction, onStart } = this.context.draggable
+    const metrics = this.props.slotMetrics
+
+    const rowBox = getBoundsForNode(node)
+
+    if (pointInBox(rowBox, { x, y })) {
+      onStart(
+        dragAndDropAction.action === 'move'
+          ? metrics.getDateForSlot(getSlotAtX(rowBox, x, false, metrics.slots))
+          : null
+      )
+    }
   }
 
   handleInteractionEnd = () => {
