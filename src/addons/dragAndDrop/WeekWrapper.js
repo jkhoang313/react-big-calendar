@@ -36,6 +36,7 @@ class WeekWrapper extends React.Component {
       onDropFromOutside: PropTypes.func,
       onBeginAction: PropTypes.func,
       dragFromOutsideItem: PropTypes.func,
+      onEventChange: PropTypes.func,
     }),
   }
 
@@ -61,7 +62,7 @@ class WeekWrapper extends React.Component {
     this.setState(this.initialState)
   }
 
-  update(event, start, end) {
+  update(event, start, end, shouldTriggerEventChange = true) {
     const segment = eventSegments(
       { ...event, end, start, __isPreview: true },
       this.props.slotMetrics.range,
@@ -80,6 +81,13 @@ class WeekWrapper extends React.Component {
       return
     }
     this.setState({ segment })
+
+    if (shouldTriggerEventChange) {
+      this.context.draggable.onEventChange(
+        segment.event.start,
+        segment.event.end
+      )
+    }
   }
 
   handleMove = ({ x, y }, node, draggedEvent) => {
@@ -270,17 +278,19 @@ class WeekWrapper extends React.Component {
       }
     }
 
-    this.update(event, start, end)
+    this.update(event, start, end, pointInBox(rowBox, point))
   }
 
   resetToInitialEvent() {
+    const { dragAndDropAction, onEventChange } = this.context.draggable
     const segment = eventSegments(
-      { ...this.context.draggable.dragAndDropAction.event, __isPreview: true },
+      { ...dragAndDropAction.event, __isPreview: true },
       this.props.slotMetrics.range,
       dragAccessors
     )
 
     this.setState({ segment: segment })
+    onEventChange(segment.event.start, segment.event.end)
   }
 
   _selectable = () => {

@@ -6,6 +6,7 @@ import { accessor } from '../../utils/propTypes'
 import EventWrapper from './EventWrapper'
 import EventContainerWrapper from './EventContainerWrapper'
 import WeekWrapper from './WeekWrapper'
+import DateCellWrapper from './DateCellWrapper'
 import { mergeComponents } from './common'
 
 /**
@@ -108,6 +109,7 @@ export default function withDragAndDrop(Calendar) {
         draggableAccessor: accessor,
         resizableAccessor: accessor,
         dragAndDropAction: PropTypes.object,
+        onEventChange: PropTypes.func,
       }),
     }
 
@@ -120,9 +122,18 @@ export default function withDragAndDrop(Calendar) {
         eventWrapper: EventWrapper,
         eventContainerWrapper: EventContainerWrapper,
         weekWrapper: WeekWrapper,
+        dateCellWrapper: DateCellWrapper,
       })
 
-      this.state = { interacting: false }
+      this.initialState = {
+        action: null,
+        event: null,
+        interacting: false,
+        direction: null,
+        hoveredDateRange: null,
+      }
+
+      this.state = this.initialState
     }
 
     getChildContext() {
@@ -131,6 +142,7 @@ export default function withDragAndDrop(Calendar) {
           onStart: this.handleInteractionStart,
           onEnd: this.handleInteractionEnd,
           onBeginAction: this.handleBeginAction,
+          onEventChange: this.handleOnEventChange,
           onDropFromOutside: this.props.onDropFromOutside,
           dragFromOutsideItem: this.props.dragFromOutsideItem,
           draggableAccessor: this.props.draggableAccessor,
@@ -161,18 +173,19 @@ export default function withDragAndDrop(Calendar) {
 
       if (!action) return
 
-      this.setState({
-        action: null,
-        event: null,
-        interacting: false,
-        direction: null,
-      })
+      this.setState(this.initialState)
 
       if (interactionInfo == null) return
 
       interactionInfo.event = event
       if (action === 'move') this.props.onEventDrop(interactionInfo)
       if (action === 'resize') this.props.onEventResize(interactionInfo)
+    }
+
+    handleOnEventChange = (start, end) => {
+      this.setState({
+        hoveredDateRange: { start, end },
+      })
     }
 
     render() {
