@@ -36,6 +36,7 @@ class MonthView extends React.Component {
     this.state = {
       rowLimit: 5,
       needLimitMeasure: true,
+      showFixedHeaders: false,
     }
   }
 
@@ -110,6 +111,21 @@ class MonthView extends React.Component {
     return findDOMNode(this)
   }
 
+  handleScroll = e => {
+    this.handleScrollDebounced(e.target.scrollTop)
+  }
+
+  handleScrollDebounced = debounce(scrollPosition => {
+    const { showFixedHeaders } = this.state
+
+    const scrollThreshold = 32
+    if (showFixedHeaders && scrollPosition < scrollThreshold) {
+      this.setState({ showFixedHeaders: false })
+    } else if (!showFixedHeaders && scrollPosition > scrollThreshold) {
+      this.setState({ showFixedHeaders: true })
+    }
+  }, 100)
+
   render() {
     let {
         date,
@@ -143,7 +159,12 @@ class MonthView extends React.Component {
         {...arrowNavProps}
         tabIndex={-1}
       >
-        <div className="rbc-row rbc-month-header" style={style}>
+        <div
+          className={clsx('rbc-row rbc-month-header rbc-fixed-header', {
+            'show-header': this.state.showFixedHeaders,
+          })}
+          style={style}
+        >
           {this.renderHeaders(weeks[0])}
         </div>
         <div
@@ -151,7 +172,11 @@ class MonthView extends React.Component {
             'rbc-month-rows-container',
             scrollableMonth && 'rbc-month-rows-container-scrollable'
           )}
+          onScroll={this.handleScroll}
         >
+          <div className="rbc-row rbc-month-header" style={style}>
+            {this.renderHeaders(weeks[0])}
+          </div>
           {weeks.map(renderWeekWithHeight)}
           {this.props.popup && this.renderOverlay()}
         </div>
