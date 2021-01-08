@@ -36,7 +36,6 @@ class MonthView extends React.Component {
     this.state = {
       rowLimit: 5,
       needLimitMeasure: true,
-      slideRight: true,
     }
   }
 
@@ -81,14 +80,8 @@ class MonthView extends React.Component {
     )
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate() {
     if (this.state.needLimitMeasure) this.measureRowLimit(this.props)
-
-    if (!dates.eq(this.props.date, prevProps.date, 'month')) {
-      this.setState({
-        slideRight: this.props.date > prevProps.date,
-      })
-    }
   }
 
   componentWillUnmount() {
@@ -188,7 +181,7 @@ class MonthView extends React.Component {
 
     const renderAllEvents = showAllEvents || flexibleRowHeight
 
-    const { needLimitMeasure, rowLimit, slideRight } = this.state
+    const { needLimitMeasure, rowLimit } = this.state
 
     events = eventsForWeek(events, week[0], week[week.length - 1], accessors)
 
@@ -229,8 +222,6 @@ class MonthView extends React.Component {
         resizable={this.props.resizable}
         showAllEvents={showAllEvents}
         style={style}
-        slideRight={slideRight}
-        animation={true}
         renderAllEvents={renderAllEvents}
       />
     )
