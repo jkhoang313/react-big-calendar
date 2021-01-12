@@ -36,7 +36,7 @@ class MonthView extends React.Component {
     this.state = {
       rowLimit: 5,
       needLimitMeasure: true,
-      slideRight: true,
+      showFixedHeaders: false,
     }
   }
 
@@ -81,14 +81,8 @@ class MonthView extends React.Component {
     )
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate() {
     if (this.state.needLimitMeasure) this.measureRowLimit(this.props)
-
-    if (!dates.eq(this.props.date, prevProps.date, 'month')) {
-      this.setState({
-        slideRight: this.props.date > prevProps.date,
-      })
-    }
   }
 
   componentWillUnmount() {
@@ -117,15 +111,20 @@ class MonthView extends React.Component {
     return findDOMNode(this)
   }
 
+  handleScroll = e => {
+    const { showFixedHeaders } = this.state
+    const scrollPosition = e.target.scrollTop
+
+    const scrollThreshold = 32
+    if (showFixedHeaders && scrollPosition < scrollThreshold) {
+      this.setState({ showFixedHeaders: false })
+    } else if (!showFixedHeaders && scrollPosition > scrollThreshold) {
+      this.setState({ showFixedHeaders: true })
+    }
+  }
+
   render() {
-    let {
-        date,
-        localizer,
-        className,
-        infiniteScroll,
-        expandRow,
-        arrowNavProps,
-      } = this.props,
+    let { date, localizer, className, infiniteScroll, expandRow } = this.props,
       month = dates.visibleDays(date, localizer),
       weeks = chunk(month, 7)
 
@@ -134,23 +133,20 @@ class MonthView extends React.Component {
 
     const style =
       scrollableMonth && scrollbarSize() > 0
-        ? {
-            marginRight: `${scrollbarSize() - 1}px`,
-            borderRight: '1px solid #DDD',
-          }
+        ? { width: `calc(100% - ${scrollbarSize()}px)` }
         : {}
 
     const renderWeekWithHeight = (week, weekIdx) =>
       this.renderWeek(week, weekIdx, weeks.length)
 
     return (
-      <div
-        className={clsx('rbc-month-view', className)}
-        ref={this.monthRef}
-        {...arrowNavProps}
-        tabIndex={-1}
-      >
-        <div className="rbc-row rbc-month-header" style={style}>
+      <div className={clsx('rbc-month-view', className)} ref={this.monthRef}>
+        <div
+          className={clsx('rbc-row rbc-month-header rbc-fixed-header', {
+            'show-header': this.state.showFixedHeaders,
+          })}
+          style={style}
+        >
           {this.renderHeaders(weeks[0])}
         </div>
         <div
@@ -158,7 +154,11 @@ class MonthView extends React.Component {
             'rbc-month-rows-container',
             scrollableMonth && 'rbc-month-rows-container-scrollable'
           )}
+          onScroll={this.handleScroll}
         >
+          <div className="rbc-row rbc-month-header">
+            {this.renderHeaders(weeks[0])}
+          </div>
           {weeks.map(renderWeekWithHeight)}
           {this.props.popup && this.renderOverlay()}
         </div>
@@ -188,7 +188,7 @@ class MonthView extends React.Component {
 
     const renderAllEvents = showAllEvents || flexibleRowHeight
 
-    const { needLimitMeasure, rowLimit, slideRight } = this.state
+    const { needLimitMeasure, rowLimit } = this.state
 
     events = eventsForWeek(events, week[0], week[week.length - 1], accessors)
 
@@ -229,8 +229,6 @@ class MonthView extends React.Component {
         resizable={this.props.resizable}
         showAllEvents={showAllEvents}
         style={style}
-        slideRight={slideRight}
-        animation={true}
         renderAllEvents={renderAllEvents}
       />
     )
@@ -472,9 +470,6 @@ MonthView.propTypes = {
   customSorting: PropTypes.shape({
     sortPriority: PropTypes.arrayOf(PropTypes.string),
     customComparators: PropTypes.object,
-  }),
-  arrowNavProps: PropTypes.shape({
-    onKeyDown: PropTypes.func,
   }),
 }
 
