@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 import TimeRowGutter from './TimeRowGutter'
@@ -14,8 +14,16 @@ const TimeSlotRow = ({
   getters,
   localizer,
 }) => {
+  const rowRef = React.createRef()
+
+  useEffect(() => {
+    if (group[0].getHours() === now.getHours() - 1) {
+      rowRef.current.scrollIntoView(true)
+    }
+  }, [])
+
   return (
-    <div className="rbc-time-slot-row">
+    <div className="rbc-time-slot-row" ref={rowRef}>
       <TimeRowGutter group={group} localizer={localizer} />
       <TimeRangeContainer
         eventsInRow={eventsInRow}
