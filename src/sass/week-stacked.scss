@@ -5,6 +5,8 @@
   flex-direction: column;
   border: 1px solid $calendar-border;
   min-height: 0;
+  height: 100%;
+  overflow-y: scroll;
 
   .rbc-allday-cell {
     box-sizing: content-box;
@@ -26,6 +28,7 @@
 .rbc-time-row-grid {
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
 .rbc-time-slot-row {
