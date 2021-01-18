@@ -29,6 +29,7 @@ const TimeRangeContainer = ({
             accessors={accessors}
             components={components}
             getters={getters}
+            now={now}
           />
         )
       })}

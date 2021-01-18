@@ -3,15 +3,19 @@ import PropTypes from 'prop-types'
 import clsx from 'clsx'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
 
+import * as dates from '../utils/dates'
+
 const TimeCell = ({
   events,
   timeSlot,
   isToday,
+  now,
   accessors,
   components: { event: Event },
   getters,
 }) => {
   const userComponentProps = getters.eventComponentProps()
+  const showCurrentTimeIndictator = dates.eq(timeSlot, now, 'hours')
 
   return (
     <Droppable droppableId={`time-cell-${timeSlot.getTime()}`}>
@@ -55,6 +59,12 @@ const TimeCell = ({
                 </Draggable>
               )
             })}
+            {showCurrentTimeIndictator && (
+              <div
+                className="rbc-current-time-indicator"
+                style={{ top: `${(now.getMinutes() / 60) * 100}%` }}
+              />
+            )}
           </div>
         )
       }}
@@ -67,6 +77,7 @@ TimeCell.propTypes = {
 
   timeSlot: PropTypes.instanceOf(Date),
   isToday: PropTypes.bool,
+  now: PropTypes.instanceOf(Date),
 
   accessors: PropTypes.object.isRequired,
   components: PropTypes.object.isRequired,

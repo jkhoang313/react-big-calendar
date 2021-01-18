@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import memoize from 'memoize-one'
 import { DragDropContext } from 'react-beautiful-dnd'
@@ -28,6 +28,17 @@ const TimeRowGrid = props => {
     onDrillDown,
     getDrilldownView,
   } = props
+  const [now, setNow] = useState(getNow())
+
+  useEffect(() => {
+    const currentTimeInterval = window.setInterval(() => {
+      setNow(getNow())
+    }, 60000)
+
+    return () => {
+      window.clearInterval(currentTimeInterval)
+    }
+  }, [])
 
   const slotMetrics = TimeSlotUtils.getSlotMetrics(props)
   let start = range[0],
@@ -60,8 +71,6 @@ const TimeRowGrid = props => {
   })
 
   allDayEvents.sort((a, b) => sortEvents(a, b, accessors, customSorting))
-
-  const now = getNow()
 
   return (
     // TODO update onDragEnd
