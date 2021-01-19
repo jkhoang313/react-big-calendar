@@ -7,7 +7,7 @@ import { navigate } from './utils/constants'
 import TimeRowGrid from './WeekStackedComponents/TimeRowGrid'
 
 const WeekStacked = props => {
-  const { date, ...restOfProps } = props
+  const { date, min: _, max: _2, ...restOfProps } = props
   const range = WeekStacked.range(date, props)
 
   return (
@@ -19,7 +19,11 @@ const WeekStacked = props => {
 
 WeekStacked.propTypes = {
   date: PropTypes.instanceOf(Date).isRequired,
+  min: PropTypes.instanceOf(Date),
+  max: PropTypes.instanceOf(Date),
 }
+
+WeekStacked.defaultProps = TimeRowGrid.defaultProps
 
 WeekStacked.range = (date, { localizer }) => {
   let firstOfWeek = localizer.startOfWeek()

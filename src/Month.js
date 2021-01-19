@@ -168,10 +168,7 @@ class MonthView extends React.Component {
         key={weekIdx}
         ref={weekIdx === 0 ? this.slotRowRef : undefined}
         container={this.getContainer}
-        className={clsx(
-          'rbc-month-row',
-          flexibleRowHeight && 'rbc-month-row-full'
-        )}
+        className="rbc-month-row rbc-month-row-full"
         getNow={getNow}
         date={date}
         range={week}
