@@ -73,9 +73,15 @@
 }
 
 .rbc-month-rows-container {
+  display: flex;
+  flex-direction: column;
   flex-grow: 1;
   // Safari fix
   height: -webkit-fit-content;
+}
+
+.rbc-month-rows-block {
+  height: 100%;
 }
 
 .rbc-month-row {
