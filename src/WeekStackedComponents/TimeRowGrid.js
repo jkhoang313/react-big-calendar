@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import memoize from 'memoize-one'
 import { DragDropContext } from 'react-beautiful-dnd'
+import { CalendarContext } from '../CalendarContext'
 
 import * as dates from '../utils/dates'
 import { inRange, sortEvents } from '../utils/eventLevels'
@@ -74,43 +75,84 @@ const TimeRowGrid = props => {
 
   return (
     // TODO update onDragEnd
-    <DragDropContext onDragEnd={() => {}}>
-      <div className="rbc-time-row-grid">
-        <TimeGridHeader
-          range={range}
-          events={allDayEvents}
-          getNow={getNow}
-          localizer={localizer}
-          resources={memoizedResources(resources, accessors)}
-          accessors={accessors}
-          getters={getters}
-          components={components}
-          longPressThreshold={longPressThreshold}
-          onDrillDown={onDrillDown}
-          getDrilldownView={getDrilldownView}
-          renderGutter={() => (
-            <TimeRowGutter group={[]} localizer={localizer} />
-          )}
-          dragContainerClass=".rbc-allday-cell"
-          resizable={resizable}
-        />
-        <div className="rbc-time-rows-container">
-          {slotMetrics.groups.map((grp, index) => (
-            <TimeSlotRow
-              key={index}
-              eventsInRow={rangeEventsByHour[index]}
+    <CalendarContext.Consumer>
+      {({ dndContext }) => (
+        <DragDropContext
+          onDragStart={provided => {
+            const eventId = parseInt(
+              provided.draggableId.replace(/[^0-9]/g, '')
+            )
+            const event = events.find(e => {
+              return e.id === eventId
+            })
+
+            dndContext.draggable.onBeginAction(event, 'move')
+          }}
+          onDragEnd={result => {
+            const { destination, source, draggableId } = result
+
+            if (!destination || destination === 'rbc-allday-cell') return
+            if (
+              destination.droppableId === source.droppableId &&
+              destination.index === source.index
+            )
+              return
+
+            const eventId = parseInt(draggableId.replace(/[^0-9]/g, ''))
+            const event = events.find(e => {
+              return e.id === eventId
+            })
+
+            const duration = accessors.end(event) - accessors.start(event)
+
+            const targetEnd = new Date(
+              parseInt(destination.droppableId.replace(/[^0-9]/g, ''))
+            )
+            const targetStart = new Date(targetEnd - duration)
+
+            const onEnd = dndContext.draggable.onEnd
+
+            return onEnd({ event, start: targetStart, end: targetEnd }) //TODO for now until we get all day drag
+          }}
+        >
+          <div className="rbc-time-row-grid">
+            <TimeGridHeader
               range={range}
-              group={grp}
-              now={now}
-              accessors={accessors}
-              components={components}
-              getters={getters}
+              events={allDayEvents}
+              getNow={getNow}
               localizer={localizer}
+              resources={memoizedResources(resources, accessors)}
+              accessors={accessors}
+              getters={getters}
+              components={components}
+              longPressThreshold={longPressThreshold}
+              onDrillDown={onDrillDown}
+              getDrilldownView={getDrilldownView}
+              renderGutter={() => (
+                <TimeRowGutter group={[]} localizer={localizer} />
+              )}
+              dragContainerClass=".rbc-allday-cell"
+              resizable={resizable}
             />
-          ))}
-        </div>
-      </div>
-    </DragDropContext>
+            <div className="rbc-time-rows-container">
+              {slotMetrics.groups.map((grp, index) => (
+                <TimeSlotRow
+                  key={index}
+                  eventsInRow={rangeEventsByHour[index]}
+                  range={range}
+                  group={grp}
+                  now={now}
+                  accessors={accessors}
+                  components={components}
+                  getters={getters}
+                  localizer={localizer}
+                />
+              ))}
+            </div>
+          </div>
+        </DragDropContext>
+      )}
+    </CalendarContext.Consumer>
   )
 }
 

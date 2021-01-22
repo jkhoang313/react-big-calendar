@@ -65,6 +65,7 @@ const TimeCell = ({
                 style={{ top: `calc(${(now.getMinutes() / 60) * 100}% - 1px)` }}
               />
             )}
+            {provided.placeholder}
           </div>
         )
       }}

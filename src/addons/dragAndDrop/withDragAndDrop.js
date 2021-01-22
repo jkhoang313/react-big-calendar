@@ -8,6 +8,7 @@ import EventContainerWrapper from './EventContainerWrapper'
 import WeekWrapper from './WeekWrapper'
 import HoveredDateWrapper from './HoveredDateWrapper'
 import { mergeComponents } from './common'
+import { CalendarContext } from '../../CalendarContext'
 
 /**
  * Creates a higher-order component (HOC) supporting drag & drop and optionally resizing
@@ -219,11 +220,15 @@ export default function withDragAndDrop(Calendar) {
       )
 
       return (
-        <Calendar
-          {...props}
-          elementProps={elementPropsWithDropFromOutside}
-          components={this.components}
-        />
+        <CalendarContext.Provider
+          value={{ dndContext: this.getChildContext() }}
+        >
+          <Calendar
+            {...props}
+            elementProps={elementPropsWithDropFromOutside}
+            components={this.components}
+          />
+        </CalendarContext.Provider>
       )
     }
   }
