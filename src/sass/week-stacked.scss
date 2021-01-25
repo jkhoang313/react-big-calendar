@@ -6,6 +6,7 @@
   border: 1px solid $calendar-border;
   min-height: 0;
   height: 100%;
+  width: 100%;
   overflow-y: scroll;
 
   .rbc-allday-cell {
