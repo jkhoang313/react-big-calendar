@@ -76,7 +76,7 @@ const TimeRowGrid = props => {
   return (
     // TODO update onDragEnd
     <CalendarContext.Consumer>
-      {({ dndContext }) => (
+      {({ dndContext } = {}) => (
         <DragDropContext
           onDragStart={provided => {
             const eventId = provided.draggableId
