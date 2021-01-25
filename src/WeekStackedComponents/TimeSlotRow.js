@@ -20,6 +20,7 @@ const TimeSlotRow = ({
     if (group[0].getHours() === now.getHours() - 1) {
       rowRef.current.scrollIntoView(true)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

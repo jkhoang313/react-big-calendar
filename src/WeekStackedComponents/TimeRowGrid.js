@@ -39,7 +39,7 @@ const TimeRowGrid = props => {
     return () => {
       window.clearInterval(currentTimeInterval)
     }
-  }, [])
+  }, [getNow])
 
   const slotMetrics = TimeSlotUtils.getSlotMetrics(props)
   let start = range[0],
