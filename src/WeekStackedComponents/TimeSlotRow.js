@@ -13,6 +13,7 @@ const TimeSlotRow = ({
   components,
   getters,
   localizer,
+  customSorting,
 }) => {
   const rowRef = React.createRef()
 
@@ -34,6 +35,7 @@ const TimeSlotRow = ({
         accessors={accessors}
         components={components}
         getters={getters}
+        customSorting={customSorting}
       />
     </div>
   )
@@ -50,6 +52,11 @@ TimeSlotRow.propTypes = {
   components: PropTypes.object.isRequired,
   getters: PropTypes.object.isRequired,
   localizer: PropTypes.object.isRequired,
+
+  customSorting: PropTypes.shape({
+    sortPriority: PropTypes.arrayOf(PropTypes.string),
+    customComparators: PropTypes.object,
+  }),
 }
 
 export default TimeSlotRow

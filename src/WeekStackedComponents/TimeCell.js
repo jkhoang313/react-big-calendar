@@ -4,6 +4,7 @@ import clsx from 'clsx'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
 
 import * as dates from '../utils/dates'
+import { sortEvents } from '../utils/eventLevels'
 
 const TimeCell = ({
   events,
@@ -13,7 +14,9 @@ const TimeCell = ({
   accessors,
   components: { event: Event },
   getters,
+  customSorting,
 }) => {
+  events.sort((a, b) => sortEvents(a, b, accessors, customSorting))
   const userComponentProps = getters.eventComponentProps()
   const showCurrentTimeIndictator = dates.eq(timeSlot, now, 'hours')
 
@@ -83,6 +86,11 @@ TimeCell.propTypes = {
   accessors: PropTypes.object.isRequired,
   components: PropTypes.object.isRequired,
   getters: PropTypes.object.isRequired,
+
+  customSorting: PropTypes.shape({
+    sortPriority: PropTypes.arrayOf(PropTypes.string),
+    customComparators: PropTypes.object,
+  }),
 }
 
 export default TimeCell

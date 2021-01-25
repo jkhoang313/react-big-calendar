@@ -142,6 +142,7 @@ const TimeRowGrid = props => {
                   components={components}
                   getters={getters}
                   localizer={localizer}
+                  customSorting={customSorting}
                 />
               ))}
             </div>

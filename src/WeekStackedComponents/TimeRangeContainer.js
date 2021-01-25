@@ -12,6 +12,7 @@ const TimeRangeContainer = ({
   accessors,
   components,
   getters,
+  customSorting,
 }) => {
   return (
     <div className="rbc-week-range-container">
@@ -30,6 +31,7 @@ const TimeRangeContainer = ({
             components={components}
             getters={getters}
             now={now}
+            customSorting={customSorting}
           />
         )
       })}
@@ -47,6 +49,11 @@ TimeRangeContainer.propTypes = {
   accessors: PropTypes.object.isRequired,
   components: PropTypes.object.isRequired,
   getters: PropTypes.object.isRequired,
+
+  customSorting: PropTypes.shape({
+    sortPriority: PropTypes.arrayOf(PropTypes.string),
+    customComparators: PropTypes.object,
+  }),
 }
 
 export default TimeRangeContainer
