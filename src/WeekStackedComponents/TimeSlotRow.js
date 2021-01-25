@@ -18,7 +18,7 @@ const TimeSlotRow = ({
 
   useEffect(() => {
     if (group[0].getHours() === now.getHours() - 1) {
-      rowRef.current.scrollIntoView(true)
+      // rowRef.current.scrollIntoView(true)
     }
   }, [])
 

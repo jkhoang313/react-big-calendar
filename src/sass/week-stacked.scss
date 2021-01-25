@@ -1,5 +1,7 @@
 @import './variables.scss';
 
+$gutter-width: 80px;
+
 .rbc-week-stacked-view {
   display: flex;
   flex-direction: column;
@@ -31,6 +33,19 @@
   width: 100%;
 }
 
+.rbc-time-row-grid-show-more {
+  position: absolute;
+  bottom: 30px;
+  left: calc(50% + #{$gutter-width / 2});
+  transform: translateX(-50%);
+  border-radius: 30px;
+  padding: 5px 15px;
+  font-size: 12px;
+  color: white;
+  background-color: blue;
+  cursor: pointer;
+}
+
 .rbc-time-slot-row {
   min-height: 40px;
   display: flex;
@@ -41,7 +56,7 @@
 .rbc-gutter {
   // line-height should same as font-size;
   line-height: 14px;
-  width: 75px;
+  width: $gutter-width;
   align-self: flex-start;
   text-align: right;
   // margin-bottom should be half of font-size;

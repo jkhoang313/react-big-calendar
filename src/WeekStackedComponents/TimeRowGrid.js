@@ -109,6 +109,7 @@ const TimeRowGrid = props => {
             />
           ))}
         </div>
+        <div className="rbc-time-row-grid-show-more">(2) More cards</div>
       </div>
     </DragDropContext>
   )
