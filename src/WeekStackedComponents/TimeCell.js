@@ -22,10 +22,14 @@ const TimeCell = ({
 
   return (
     <Droppable droppableId={`${timeSlot.getTime()}`}>
-      {provided => {
+      {(provided, snapshot) => {
         return (
           <div
-            className={clsx('rbc-time-cell', isToday && 'rbc-today')}
+            className={clsx(
+              'rbc-time-cell',
+              isToday && 'rbc-today',
+              snapshot.isDraggingOver && 'rbc-addons-dnd-over'
+            )}
             ref={provided.innerRef}
             {...provided.droppableProps}
           >
