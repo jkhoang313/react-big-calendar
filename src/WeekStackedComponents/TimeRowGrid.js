@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import memoize from 'memoize-one'
 import { DragDropContext } from 'react-beautiful-dnd'
@@ -30,6 +30,7 @@ const TimeRowGrid = props => {
     getDrilldownView,
   } = props
   const [now, setNow] = useState(getNow())
+  const { dndContext } = useContext(CalendarContext)
 
   useEffect(() => {
     const currentTimeInterval = window.setInterval(() => {
@@ -74,82 +75,77 @@ const TimeRowGrid = props => {
   allDayEvents.sort((a, b) => sortEvents(a, b, accessors, customSorting))
 
   return (
-    // TODO update onDragEnd
-    <CalendarContext.Consumer>
-      {({ dndContext } = {}) => (
-        <DragDropContext
-          onDragStart={provided => {
-            const eventId = provided.draggableId
+    <DragDropContext
+      onDragStart={provided => {
+        const eventId = provided.draggableId
 
-            const event = events.find(e => {
-              return accessors.id(e).toString() === eventId.toString()
-            })
+        const event = events.find(e => {
+          return accessors.id(e).toString() === eventId.toString()
+        })
 
-            dndContext.draggable.onBeginAction(event, 'move')
-          }}
-          onDragEnd={result => {
-            const { destination, source, draggableId } = result
+        dndContext.draggable.onBeginAction(event, 'move')
+      }}
+      onDragEnd={result => {
+        const { destination, source, draggableId } = result
 
-            if (!destination || destination === 'rbc-allday-cell') return
-            if (
-              destination.droppableId === source.droppableId &&
-              destination.index === source.index
-            )
-              return
+        if (!destination || destination === 'rbc-allday-cell') return
+        if (
+          destination.droppableId === source.droppableId &&
+          destination.index === source.index
+        )
+          return
 
-            const eventId = draggableId
-            const event = events.find(e => {
-              return accessors.id(e).toString() === eventId.toString()
-            })
-            const duration = accessors.end(event) - accessors.start(event)
+        const eventId = draggableId
+        const event = events.find(e => {
+          return accessors.id(e).toString() === eventId.toString()
+        })
+        const duration = accessors.end(event) - accessors.start(event)
 
-            const targetEnd = new Date(parseInt(destination.droppableId))
-            const targetStart = new Date(targetEnd - duration)
+        const targetEnd = new Date(parseInt(destination.droppableId))
+        const targetStart = new Date(targetEnd - duration)
 
-            const onEnd = dndContext.draggable.onEnd
+        const onEnd = dndContext.draggable.onEnd
 
-            return onEnd({ event, start: targetStart, end: targetEnd }) //TODO for now until we get all day drag
-          }}
-        >
-          <div className="rbc-time-row-grid">
-            <TimeGridHeader
+        return onEnd({ event, start: targetStart, end: targetEnd }) //TODO for now until we get all day drag
+      }}
+    >
+      <div className="rbc-time-row-grid">
+        <TimeGridHeader
+          range={range}
+          events={allDayEvents}
+          getNow={getNow}
+          localizer={localizer}
+          resources={memoizedResources(resources, accessors)}
+          accessors={accessors}
+          getters={getters}
+          components={components}
+          longPressThreshold={longPressThreshold}
+          onDrillDown={onDrillDown}
+          getDrilldownView={getDrilldownView}
+          renderGutter={() => (
+            <TimeRowGutter group={[]} localizer={localizer} />
+          )}
+          dragContainerClass=".rbc-allday-cell"
+          resizable={resizable}
+        />
+        <div className="rbc-time-rows-container">
+          {slotMetrics.groups.map((grp, index) => (
+            <TimeSlotRow
+              key={index}
+              eventsInRow={rangeEventsByHour[index]}
               range={range}
-              events={allDayEvents}
-              getNow={getNow}
-              localizer={localizer}
-              resources={memoizedResources(resources, accessors)}
+              group={grp}
+              now={now}
               accessors={accessors}
-              getters={getters}
               components={components}
-              longPressThreshold={longPressThreshold}
-              onDrillDown={onDrillDown}
-              getDrilldownView={getDrilldownView}
-              renderGutter={() => (
-                <TimeRowGutter group={[]} localizer={localizer} />
-              )}
-              dragContainerClass=".rbc-allday-cell"
-              resizable={resizable}
+              getters={getters}
+              localizer={localizer}
+              customSorting={customSorting}
             />
-            <div className="rbc-time-rows-container">
-              {slotMetrics.groups.map((grp, index) => (
-                <TimeSlotRow
-                  key={index}
-                  eventsInRow={rangeEventsByHour[index]}
-                  range={range}
-                  group={grp}
-                  now={now}
-                  accessors={accessors}
-                  components={components}
-                  getters={getters}
-                  localizer={localizer}
-                  customSorting={customSorting}
-                />
-              ))}
-            </div>
-          </div>
-        </DragDropContext>
-      )}
-    </CalendarContext.Consumer>
+          ))}
+        </div>
+      </div>
+    </DragDropContext>
   )
 }
 
