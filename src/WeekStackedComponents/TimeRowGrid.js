@@ -79,11 +79,10 @@ const TimeRowGrid = props => {
       {({ dndContext }) => (
         <DragDropContext
           onDragStart={provided => {
-            const eventId = parseInt(
-              provided.draggableId.replace(/[^0-9]/g, '')
-            )
+            const eventId = provided.draggableId
+
             const event = events.find(e => {
-              return e.id === eventId
+              return accessors.id(e).toString() === eventId.toString()
             })
 
             dndContext.draggable.onBeginAction(event, 'move')
@@ -98,16 +97,13 @@ const TimeRowGrid = props => {
             )
               return
 
-            const eventId = parseInt(draggableId.replace(/[^0-9]/g, ''))
+            const eventId = draggableId
             const event = events.find(e => {
-              return e.id === eventId
+              return accessors.id(e).toString() === eventId.toString()
             })
-
             const duration = accessors.end(event) - accessors.start(event)
 
-            const targetEnd = new Date(
-              parseInt(destination.droppableId.replace(/[^0-9]/g, ''))
-            )
+            const targetEnd = new Date(destination.droppableId.toString())
             const targetStart = new Date(targetEnd - duration)
 
             const onEnd = dndContext.draggable.onEnd
