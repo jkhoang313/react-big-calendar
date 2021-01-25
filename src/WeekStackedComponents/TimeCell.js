@@ -18,7 +18,7 @@ const TimeCell = ({
   const showCurrentTimeIndictator = dates.eq(timeSlot, now, 'hours')
 
   return (
-    <Droppable droppableId={`time-cell-${timeSlot.getTime()}`}>
+    <Droppable droppableId={`${timeSlot.getTime()}`}>
       {provided => {
         return (
           <div
@@ -32,8 +32,8 @@ const TimeCell = ({
               return (
                 <Draggable
                   // TODO change this to accessor?
-                  draggableId={`evt_${event.id}`}
-                  key={`evt_${event.id}`}
+                  draggableId={`${accessors.id(event)}`}
+                  key={`${accessors.id(event)}`}
                   index={index}
                 >
                   {provided => {
