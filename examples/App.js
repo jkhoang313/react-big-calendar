@@ -29,6 +29,7 @@ import Timeslots from './demos/timeslots'
 import Dnd from './demos/dnd'
 import DndOutsideSource from './demos/dndOutsideSource'
 import StackedWeek from './demos/stackedWeek'
+import TrelloCal from './demos/trelloCal'
 import Dropdown from 'react-bootstrap/lib/Dropdown'
 import MenuItem from 'react-bootstrap/lib/MenuItem'
 
@@ -38,6 +39,7 @@ let demoRoot =
   'https://github.com/intljusticemission/react-big-calendar/tree/master/examples/demos'
 
 const EXAMPLES = {
+  TrelloCal: 'Basic (Trello!) Calendar',
   basic: 'Basic Calendar',
   selectable: 'Create events',
   createEventWithNoOverlap: 'Create events with no-overlap algorithm',
@@ -55,7 +57,7 @@ const EXAMPLES = {
     'Custom week view that displays events stacked instead of overlapping',
 }
 
-const DEFAULT_EXAMPLE = 'basic'
+const DEFAULT_EXAMPLE = 'trelloCal'
 
 class Example extends React.Component {
   constructor(...args) {
@@ -78,6 +80,7 @@ class Example extends React.Component {
   render() {
     let selected = this.state.selected
     let Current = {
+      trelloCal: TrelloCal,
       basic: Basic,
       selectable: Selectable,
       cultures: Cultures,
