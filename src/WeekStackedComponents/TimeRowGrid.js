@@ -39,7 +39,7 @@ const TimeRowGrid = props => {
     return () => {
       window.clearInterval(currentTimeInterval)
     }
-  }, [])
+  }, [getNow])
 
   const slotMetrics = TimeSlotUtils.getSlotMetrics(props)
   let start = range[0],
@@ -76,7 +76,7 @@ const TimeRowGrid = props => {
   return (
     // TODO update onDragEnd
     <CalendarContext.Consumer>
-      {({ dndContext }) => (
+      {({ dndContext } = {}) => (
         <DragDropContext
           onDragStart={provided => {
             const eventId = provided.draggableId
@@ -142,6 +142,7 @@ const TimeRowGrid = props => {
                   components={components}
                   getters={getters}
                   localizer={localizer}
+                  customSorting={customSorting}
                 />
               ))}
             </div>
