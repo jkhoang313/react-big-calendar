@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import memoize from 'memoize-one'
 import { DragDropContext } from 'react-beautiful-dnd'
-import { CalendarContext } from '../CalendarContext'
+import { useCalendarContext } from '../CalendarContext'
 
 import * as dates from '../utils/dates'
 import { inRange, sortEvents } from '../utils/eventLevels'
@@ -30,7 +30,7 @@ const TimeRowGrid = props => {
     getDrilldownView,
   } = props
   const [now, setNow] = useState(getNow())
-  const { dndContext } = useContext(CalendarContext)
+  const { draggable } = useCalendarContext()
 
   useEffect(() => {
     const currentTimeInterval = window.setInterval(() => {
@@ -83,7 +83,7 @@ const TimeRowGrid = props => {
           return accessors.id(e).toString() === eventId.toString()
         })
 
-        dndContext.draggable.onBeginAction(event, 'move')
+        draggable.onBeginAction(event, 'move')
       }}
       onDragEnd={result => {
         const { destination, source, draggableId } = result
@@ -104,7 +104,7 @@ const TimeRowGrid = props => {
         const targetEnd = new Date(parseInt(destination.droppableId))
         const targetStart = new Date(targetEnd - duration)
 
-        const onEnd = dndContext.draggable.onEnd
+        const onEnd = draggable.onEnd
 
         return onEnd({ event, start: targetStart, end: targetEnd }) //TODO for now until we get all day drag
       }}
