@@ -103,7 +103,7 @@ const TimeRowGrid = props => {
             })
             const duration = accessors.end(event) - accessors.start(event)
 
-            const targetEnd = new Date(destination.droppableId.toString())
+            const targetEnd = new Date(parseInt(destination.droppableId))
             const targetStart = new Date(targetEnd - duration)
 
             const onEnd = dndContext.draggable.onEnd
