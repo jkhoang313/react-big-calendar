@@ -10,6 +10,7 @@ const TimeCell = ({
   events,
   timeSlot,
   isToday,
+  isWeekend,
   now,
   accessors,
   components: { event: Event },
@@ -28,6 +29,7 @@ const TimeCell = ({
             className={clsx(
               'rbc-time-cell',
               isToday && 'rbc-today',
+              isWeekend && 'is-weekend-bg',
               snapshot.isDraggingOver && 'rbc-addons-dnd-over'
             )}
             ref={provided.innerRef}
@@ -85,6 +87,7 @@ TimeCell.propTypes = {
 
   timeSlot: PropTypes.instanceOf(Date),
   isToday: PropTypes.bool,
+  isWeekend: PropTypes.bool,
   now: PropTypes.instanceOf(Date),
 
   accessors: PropTypes.object.isRequired,

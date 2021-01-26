@@ -39,7 +39,7 @@ let demoRoot =
   'https://github.com/intljusticemission/react-big-calendar/tree/master/examples/demos'
 
 const EXAMPLES = {
-  TrelloCal: 'Basic (Trello!) Calendar',
+  trelloCal: 'Basic (Trello!) Calendar',
   basic: 'Basic Calendar',
   selectable: 'Create events',
   createEventWithNoOverlap: 'Create events with no-overlap algorithm',

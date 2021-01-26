@@ -26,6 +26,7 @@ const TimeRangeContainer = ({
             key={index}
             timeSlot={dates.merge(date, group[0])}
             isToday={dates.eq(date, now, 'day')}
+            isWeekend={date.getDay() === 6 || date.getDay() === 0}
             events={events}
             accessors={accessors}
             components={components}
