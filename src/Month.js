@@ -8,6 +8,7 @@ import chunk from 'lodash/chunk'
 
 import { navigate, views } from './utils/constants'
 import { notify } from './utils/helpers'
+import { handleScrollingHeader } from './utils/scrolling'
 import getPosition from 'dom-helpers/position'
 import * as animationFrame from 'dom-helpers/animationFrame'
 import scrollbarSize from 'dom-helpers/scrollbarSize'
@@ -76,15 +77,9 @@ class MonthView extends React.Component {
   }
 
   handleScroll = e => {
-    const { showFixedHeaders } = this.state
-    const scrollPosition = e.target.scrollTop
-
-    const scrollThreshold = 32
-    if (showFixedHeaders && scrollPosition < scrollThreshold) {
-      this.setState({ showFixedHeaders: false })
-    } else if (!showFixedHeaders && scrollPosition > scrollThreshold) {
-      this.setState({ showFixedHeaders: true })
-    }
+    handleScrollingHeader(e, this.state.showFixedHeaders, headerShown => {
+      this.setState({ showFixedHeaders: headerShown })
+    })
   }
 
   render() {
