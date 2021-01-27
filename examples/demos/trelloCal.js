@@ -1,9 +1,13 @@
 import React from 'react'
-import events from '../events'
-import { Calendar, Views } from 'react-big-calendar'
+import { Calendar, Views, momentLocalizer } from 'react-big-calendar'
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
+import moment from 'moment'
 
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.scss'
+
+import events from '../events'
+
+const localizer = momentLocalizer(moment)
 
 const DragAndDropCalendar = withDragAndDrop(Calendar)
 
@@ -41,8 +45,6 @@ class TrelloCal extends React.Component {
     this.setState({
       events: nextEvents,
     })
-
-    // alert(`${event.title} was dropped onto ${updatedEvent.start}`)
   }
 
   resizeEvent = ({ event, start, end }) => {
@@ -57,28 +59,34 @@ class TrelloCal extends React.Component {
     this.setState({
       events: nextEvents,
     })
-
-    //alert(`${event.title} was resized to ${start}-${end}`)
   }
 
   render() {
     return (
       <DragAndDropCalendar
-        selectable
-        localizer={this.props.localizer}
+        localizer={localizer}
         events={this.state.events}
+        formats={{
+          dateFormat: 'D',
+          monthHeaderFormat: 'MMM YYYY',
+          dayFormat: 'D',
+          dayRangeHeaderFormat: ({ start }, _, localizer) =>
+            localizer.format(start, 'MMM YYYY'),
+          timeGutterFormat: 'h A',
+        }}
         onEventDrop={this.moveEvent}
         resizable
         onEventResize={this.resizeEvent}
-        defaultView={Views.MONTH}
-        defaultDate={new Date(2021, 3, 12)}
-        enableArrowNav
+        views={[Views.MONTH, Views.WEEK]}
+        defaultView={Views.WEEK}
         expandRow
-        formats={{
-          dateFormat: 'dd',
-          monthHeaderFormat: 'MMM yyyy', //not sure why this has to be lowercase (is YYYY on AdvancedCalendarComponent)
+        messages={{
+          showMore: count => {
+            return `Show all cards (${count})`
+          },
         }}
-        views={[Views.MONTH, Views.WEEK_STACKED]}
+        enableArrowNav
+        defaultDate={new Date(2021, 3, 12)}
       />
     )
   }

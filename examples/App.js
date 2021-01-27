@@ -99,7 +99,7 @@ class Example extends React.Component {
 
     return (
       <div className="app">
-        <div className="jumbotron">
+        {/* <div className="jumbotron">
           <div className="container">
             <h1>
               Big Calendar <i className="fa fa-calendar" />
@@ -122,7 +122,7 @@ class Example extends React.Component {
               </a>
             </p>
           </div>
-        </div>
+        </div> */}
         <div className="examples">
           <Card className="examples--header">
             <Layout
@@ -166,12 +166,12 @@ class Example extends React.Component {
             <Current localizer={globalizeLocalizer} />
           </div>
         </div>
-        <div className="docs">
+        {/* <div className="docs">
           <div className="contain section">
             <Intro />
           </div>
           <Api className="contain section" />
-        </div>
+        </div> */}
       </div>
     )
   }
