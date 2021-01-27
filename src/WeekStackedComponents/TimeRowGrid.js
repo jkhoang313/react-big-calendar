@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import memoize from 'memoize-one'
 import { DragDropContext } from 'react-beautiful-dnd'
 import { useCalendarContext } from '../CalendarContext'
 import clsx from 'clsx'
@@ -8,7 +7,6 @@ import scrollbarSize from 'dom-helpers/scrollbarSize'
 
 import * as dates from '../utils/dates'
 import { inRange, sortEvents } from '../utils/eventLevels'
-import Resources from '../utils/Resources'
 import { handleScrollingHeader } from '../utils/scrolling'
 import * as TimeSlotUtils from '../utils/TimeSlots'
 import TimeGridHeader from '../TimeGridHeader'
@@ -19,7 +17,6 @@ import TimeSlotRow from './TimeSlotRow'
 const TimeRowGrid = props => {
   const {
     events,
-    resources,
     range,
     getNow,
     showMultiDayTimes,
@@ -47,37 +44,45 @@ const TimeRowGrid = props => {
     }
   }, [getNow])
 
-  const slotMetrics = TimeSlotUtils.getSlotMetrics(props)
+  const slotMetrics = React.useMemo(() => TimeSlotUtils.getSlotMetrics(props), [
+    props,
+  ])
+
   let start = range[0],
     end = range[range.length - 1]
   const numTimeSlotRows = slotMetrics.groups.length
 
-  const memoizedResources = memoize((resources, accessors) =>
-    Resources(resources, accessors)
-  )
+  const [allDayEvents, rangeEventsByHour] = React.useMemo(() => {
+    let allDayEvents = [],
+      rangeEventsByHour = Array.from(Array(numTimeSlotRows), () => [])
 
-  let allDayEvents = [],
-    rangeEventsByHour = Array.from(Array(numTimeSlotRows), () => [])
+    events.forEach(event => {
+      if (inRange(event, start, end, accessors)) {
+        let eStart = accessors.start(event),
+          eEnd = accessors.end(event)
 
-  events.forEach(event => {
-    if (inRange(event, start, end, accessors)) {
-      let eStart = accessors.start(event),
-        eEnd = accessors.end(event)
-
-      if (
-        accessors.allDay(event) ||
-        (dates.isJustDate(eStart) && dates.isJustDate(eEnd)) ||
-        (!showMultiDayTimes && !dates.eq(eStart, eEnd, 'day'))
-      ) {
-        allDayEvents.push(event)
-      } else {
-        const eventEndHours = accessors.end(event).getHours()
-        rangeEventsByHour[eventEndHours].push(event)
+        if (
+          accessors.allDay(event) ||
+          (dates.isJustDate(eStart) && dates.isJustDate(eEnd)) ||
+          (!showMultiDayTimes && !dates.eq(eStart, eEnd, 'day'))
+        ) {
+          allDayEvents.push(event)
+        } else {
+          const eventEndHours = accessors.end(event).getHours()
+          rangeEventsByHour[eventEndHours].push(event)
+        }
       }
-    }
-  })
+    })
 
-  allDayEvents.sort((a, b) => sortEvents(a, b, accessors, customSorting))
+    allDayEvents.sort((a, b) => sortEvents(a, b, accessors, customSorting))
+
+    return [allDayEvents, rangeEventsByHour]
+  }, [numTimeSlotRows, events, start, end, accessors, showMultiDayTimes])
+
+  const renderGutter = React.useCallback(
+    () => <TimeRowGutter localizer={localizer} />,
+    [localizer]
+  )
 
   const handleScroll = e => {
     handleScrollingHeader(e, showFixedHeaders, headerShown => {
@@ -130,16 +135,13 @@ const TimeRowGrid = props => {
             events={allDayEvents}
             getNow={getNow}
             localizer={localizer}
-            resources={memoizedResources(resources, accessors)}
             accessors={accessors}
             getters={getters}
             components={components}
             longPressThreshold={longPressThreshold}
             onDrillDown={onDrillDown}
             getDrilldownView={getDrilldownView}
-            renderGutter={() => (
-              <TimeRowGutter group={[]} localizer={localizer} />
-            )}
+            renderGutter={renderGutter}
             dragContainerClass=".rbc-allday-cell"
             resizable={resizable}
           />
@@ -171,7 +173,7 @@ const TimeRowGrid = props => {
                 key={index}
                 eventsInRow={rangeEventsByHour[index]}
                 range={range}
-                group={grp}
+                group={grp[0]}
                 now={now}
                 accessors={accessors}
                 components={components}
@@ -196,7 +198,6 @@ TimeRowGrid.defaultProps = {
 
 TimeRowGrid.propTypes = {
   events: PropTypes.array.isRequired,
-  resources: PropTypes.array,
 
   step: PropTypes.number,
   timeslots: PropTypes.number,

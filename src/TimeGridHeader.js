@@ -3,6 +3,7 @@ import clsx from 'clsx'
 import scrollbarSize from 'dom-helpers/scrollbarSize'
 import React from 'react'
 
+import Resources from './utils/Resources'
 import DateContentRow from './DateContentRow'
 import ResourceHeader from './ResourceHeader'
 import TimeGridHeaderCells from './TimeGridHeaderCells'
@@ -192,6 +193,10 @@ TimeGridHeader.propTypes = {
   scrollRef: PropTypes.any,
   renderGutter: PropTypes.func,
   dragContainerClass: PropTypes.string,
+}
+
+TimeGridHeader.defaultProps = {
+  resources: new Resources(),
 }
 
 export default TimeGridHeader

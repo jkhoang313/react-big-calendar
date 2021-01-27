@@ -4,17 +4,17 @@ import PropTypes from 'prop-types'
 const TimeRowGutter = ({ group, localizer }) => {
   return (
     <div className="rbc-gutter">
-      {group.map((value, index) => (
-        <span key={index} className="rbc-label">
-          {localizer.format(value, 'timeGutterFormat')}
+      {group && (
+        <span className="rbc-label">
+          {localizer.format(group, 'timeGutterFormat')}
         </span>
-      ))}
+      )}
     </div>
   )
 }
 
 TimeRowGutter.propTypes = {
-  group: PropTypes.arrayOf(PropTypes.instanceOf(Date)),
+  group: PropTypes.instanceOf(Date),
   localizer: PropTypes.object.isRequired,
 }
 
