@@ -3,68 +3,12 @@ import clsx from 'clsx'
 import scrollbarSize from 'dom-helpers/scrollbarSize'
 import React from 'react'
 
-import * as dates from './utils/dates'
+import Resources from './utils/Resources'
 import DateContentRow from './DateContentRow'
-import Header from './Header'
 import ResourceHeader from './ResourceHeader'
-import { notify } from './utils/helpers'
+import TimeGridHeaderCells from './TimeGridHeaderCells'
 
 class TimeGridHeader extends React.Component {
-  handleHeaderClick = (date, view, e) => {
-    e.preventDefault()
-    notify(this.props.onDrillDown, [date, view])
-  }
-
-  renderHeaderCells(range) {
-    let {
-      localizer,
-      getDrilldownView,
-      getNow,
-      getters: { dayProp },
-      components: {
-        header: HeaderComponent = Header,
-        headerWrapper: HeaderWrapper,
-      },
-    } = this.props
-
-    const today = getNow()
-
-    return range.map((date, i) => {
-      let drilldownView = getDrilldownView(date)
-      let label = localizer.format(date, 'dayFormat')
-
-      const { className, style } = dayProp(date)
-
-      let header = (
-        <HeaderComponent date={date} label={label} localizer={localizer} />
-      )
-
-      return (
-        <HeaderWrapper key={i} value={date}>
-          <div
-            key={i}
-            style={style}
-            className={clsx(
-              'rbc-header',
-              className,
-              dates.eq(date, today, 'day') && 'rbc-today'
-            )}
-          >
-            {drilldownView ? (
-              <a
-                href="#"
-                onClick={e => this.handleHeaderClick(date, drilldownView, e)}
-              >
-                {header}
-              </a>
-            ) : (
-              <span>{header}</span>
-            )}
-          </div>
-        </HeaderWrapper>
-      )
-    })
-  }
   renderRow = resource => {
     let {
       events,
@@ -134,6 +78,8 @@ class TimeGridHeader extends React.Component {
       resizable,
       renderGutter,
       dragContainerClass,
+      onDrillDown,
+      getDrilldownView,
     } = this.props
 
     let style = {}
@@ -178,7 +124,15 @@ class TimeGridHeader extends React.Component {
                 range.length <= 1 ? ' rbc-time-header-cell-single-day' : ''
               }`}
             >
-              {this.renderHeaderCells(range)}
+              <TimeGridHeaderCells
+                range={range}
+                getNow={getNow}
+                localizer={localizer}
+                components={components}
+                getters={getters}
+                onDrillDown={onDrillDown}
+                getDrilldownView={getDrilldownView}
+              />
             </div>
             <DateContentRow
               isAllDay
@@ -239,6 +193,10 @@ TimeGridHeader.propTypes = {
   scrollRef: PropTypes.any,
   renderGutter: PropTypes.func,
   dragContainerClass: PropTypes.string,
+}
+
+TimeGridHeader.defaultProps = {
+  resources: new Resources(),
 }
 
 export default TimeGridHeader

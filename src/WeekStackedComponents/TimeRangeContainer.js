@@ -24,7 +24,7 @@ const TimeRangeContainer = ({
         return (
           <TimeCell
             key={index}
-            timeSlot={dates.merge(date, group[0])}
+            timeSlot={dates.merge(date, group)}
             isToday={dates.eq(date, now, 'day')}
             isWeekend={date.getDay() === 6 || date.getDay() === 0}
             events={events}
@@ -44,7 +44,7 @@ TimeRangeContainer.propTypes = {
   eventsInRow: PropTypes.array.isRequired,
 
   range: PropTypes.arrayOf(PropTypes.instanceOf(Date)),
-  group: PropTypes.arrayOf(PropTypes.instanceOf(Date)),
+  group: PropTypes.instanceOf(Date),
   now: PropTypes.instanceOf(Date),
 
   accessors: PropTypes.object.isRequired,

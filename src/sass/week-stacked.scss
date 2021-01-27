@@ -1,5 +1,8 @@
 @import './variables.scss';
 
+$gutter-width: 75px;
+$font-size: 14px;
+
 .rbc-week-stacked-view {
   display: flex;
   flex-direction: column;
@@ -7,7 +10,6 @@
   min-height: 0;
   height: 100%;
   width: 100%;
-  overflow-y: scroll;
 
   .rbc-allday-cell {
     box-sizing: content-box;
@@ -24,6 +26,19 @@
     box-sizing: border-box;
     min-height: 20px;
   }
+
+  .rbc-fixed-header {
+    // 1px accounts for borders left and right
+    left: $gutter-width + 1px;
+    width: calc(100% - #{$gutter-width + 1px});
+    border-left: 1px solid $cell-border;
+    border-right: 1px solid $cell-border;
+  }
+}
+
+.rbc-time-row-grid-scrollable-container {
+  height: 100%;
+  overflow-y: scroll;
 }
 
 .rbc-time-row-grid {
@@ -33,20 +48,16 @@
 }
 
 .rbc-time-slot-row {
-  min-height: 40px;
+  min-height: 80px;
   display: flex;
-  // TODO we might need?
-  // flex-flow: column nowrap;
 }
 
 .rbc-gutter {
-  // line-height should same as font-size;
-  line-height: 14px;
-  width: 75px;
+  line-height: $font-size;
+  width: $gutter-width;
   align-self: flex-start;
   text-align: right;
-  // margin-bottom should be half of font-size;
-  margin-top: -7px;
+  margin-top: $font-size * -1 / 2;
 }
 
 .rbc-week-range-container {
@@ -59,6 +70,8 @@
   border-left: 1px solid #DDD;
   flex: 1 0 0;
   position: relative;
+  width: 0;
+  overflow: hidden;
 }
 
 .rbc-time-cell {

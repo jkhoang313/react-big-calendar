@@ -1026,6 +1026,29 @@ class Calendar extends React.Component {
     const userToolbarProps = getters.toolbarComponentProps()
     const label = View.title(current, { localizer, length })
 
+    const viewComponent = (
+      <View
+        {...props}
+        events={events}
+        date={current}
+        getNow={getNow}
+        length={length}
+        localizer={localizer}
+        getters={getters}
+        components={components}
+        accessors={accessors}
+        showMultiDayTimes={showMultiDayTimes}
+        getDrilldownView={this.getDrilldownView}
+        onNavigate={this.handleNavigate}
+        onDrillDown={this.handleDrillDown}
+        onSelectEvent={this.handleSelectEvent}
+        onDoubleClickEvent={this.handleDoubleClickEvent}
+        onKeyPressEvent={this.handleKeyPressEvent}
+        onSelectSlot={this.handleSelectSlot}
+        onShowMore={onShowMore}
+      />
+    )
+
     return (
       <div
         {...elementProps}
@@ -1047,44 +1070,29 @@ class Calendar extends React.Component {
             {...userToolbarProps}
           />
         )}
-        <TransitionGroup
-          className={clsx(
-            'rbc-view-container',
-            this.slideRight ? 'slide-right' : 'slide-left'
-          )}
-        >
-          <CSSTransition
-            key={dates.startOf(current, view).getTime()}
-            timeout={400}
-            classNames={{
-              enter: 'slide-in-enter',
-              enterActive: 'slide-in-enter-active',
-              exit: 'slide-out-exit',
-              exitActive: 'slide-out-exit-active',
-            }}
+        {view === views.MONTH ? (
+          <TransitionGroup
+            className={clsx(
+              'rbc-view-container',
+              this.slideRight ? 'slide-right' : 'slide-left'
+            )}
           >
-            <View
-              {...props}
-              events={events}
-              date={current}
-              getNow={getNow}
-              length={length}
-              localizer={localizer}
-              getters={getters}
-              components={components}
-              accessors={accessors}
-              showMultiDayTimes={showMultiDayTimes}
-              getDrilldownView={this.getDrilldownView}
-              onNavigate={this.handleNavigate}
-              onDrillDown={this.handleDrillDown}
-              onSelectEvent={this.handleSelectEvent}
-              onDoubleClickEvent={this.handleDoubleClickEvent}
-              onKeyPressEvent={this.handleKeyPressEvent}
-              onSelectSlot={this.handleSelectSlot}
-              onShowMore={onShowMore}
-            />
-          </CSSTransition>
-        </TransitionGroup>
+            <CSSTransition
+              key={dates.startOf(current, view).getTime()}
+              timeout={400}
+              classNames={{
+                enter: 'slide-in-enter',
+                enterActive: 'slide-in-enter-active',
+                exit: 'slide-out-exit',
+                exitActive: 'slide-out-exit-active',
+              }}
+            >
+              {viewComponent}
+            </CSSTransition>
+          </TransitionGroup>
+        ) : (
+          <div className="rbc-view-container">{viewComponent}</div>
+        )}
       </div>
     )
   }
