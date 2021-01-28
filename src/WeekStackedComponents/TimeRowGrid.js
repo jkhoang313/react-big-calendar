@@ -63,7 +63,6 @@ const TimeRowGrid = props => {
 
         if (
           accessors.allDay(event) ||
-          (dates.isJustDate(eStart) && dates.isJustDate(eEnd)) ||
           (!showMultiDayTimes && !dates.eq(eStart, eEnd, 'day'))
         ) {
           allDayEvents.push(event)
