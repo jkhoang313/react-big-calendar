@@ -91,45 +91,67 @@ const TimeRowGrid = props => {
   }
 
   return (
-    <div
-      className="rbc-time-row-grid-scrollable-container"
-      onScroll={handleScroll}
-    >
-      <DragDropContext
-        onDragStart={provided => {
-          const eventId = provided.draggableId
-
-          const event = events.find(e => {
-            return accessors.id(e).toString() === eventId.toString()
-          })
-
-          draggable.onBeginAction(event, 'move')
-        }}
-        onDragEnd={result => {
-          const { destination, source, draggableId } = result
-
-          if (!destination || destination === 'rbc-allday-cell') return
-          if (
-            destination.droppableId === source.droppableId &&
-            destination.index === source.index
-          )
-            return
-
-          const eventId = draggableId
-          const event = events.find(e => {
-            return accessors.id(e).toString() === eventId.toString()
-          })
-          const duration = accessors.end(event) - accessors.start(event)
-
-          const targetEnd = new Date(parseInt(destination.droppableId))
-          const targetStart = new Date(targetEnd - duration)
-
-          const onEnd = draggable.onEnd
-
-          return onEnd({ event, start: targetStart, end: targetEnd }) //TODO for now until we get all day drag
-        }}
+    <>
+      <div
+        className={clsx('rbc-row rbc-fixed-header', {
+          'show-header': showFixedHeaders,
+        })}
+        style={
+          scrollbarSize() > 0
+            ? {
+                paddingRight: `${scrollbarSize()}px`,
+              }
+            : {}
+        }
       >
-        <div className="rbc-time-row-grid">
+        <TimeGridHeaderCells
+          range={range}
+          getNow={getNow}
+          localizer={localizer}
+          components={components}
+          getters={getters}
+          onDrillDown={onDrillDown}
+          getDrilldownView={getDrilldownView}
+        />
+      </div>
+      <div
+        className="rbc-time-row-grid-container-scrollable"
+        onScroll={handleScroll}
+      >
+        <DragDropContext
+          onDragStart={provided => {
+            const eventId = provided.draggableId
+
+            const event = events.find(e => {
+              return accessors.id(e).toString() === eventId.toString()
+            })
+
+            draggable.onBeginAction(event, 'move')
+          }}
+          onDragEnd={result => {
+            const { destination, source, draggableId } = result
+
+            if (!destination || destination === 'rbc-allday-cell') return
+            if (
+              destination.droppableId === source.droppableId &&
+              destination.index === source.index
+            )
+              return
+
+            const eventId = draggableId
+            const event = events.find(e => {
+              return accessors.id(e).toString() === eventId.toString()
+            })
+            const duration = accessors.end(event) - accessors.start(event)
+
+            const targetEnd = new Date(parseInt(destination.droppableId))
+            const targetStart = new Date(targetEnd - duration)
+
+            const onEnd = draggable.onEnd
+
+            return onEnd({ event, start: targetStart, end: targetEnd }) //TODO for now until we get all day drag
+          }}
+        >
           <TimeGridHeader
             range={range}
             events={allDayEvents}
@@ -145,28 +167,6 @@ const TimeRowGrid = props => {
             dragContainerClass=".rbc-allday-cell"
             resizable={resizable}
           />
-          <div
-            className={clsx('rbc-row rbc-fixed-header', {
-              'show-header': showFixedHeaders,
-            })}
-            style={
-              scrollbarSize() > 0
-                ? {
-                    paddingRight: `${scrollbarSize()}px`,
-                  }
-                : {}
-            }
-          >
-            <TimeGridHeaderCells
-              range={range}
-              getNow={getNow}
-              localizer={localizer}
-              components={components}
-              getters={getters}
-              onDrillDown={onDrillDown}
-              getDrilldownView={getDrilldownView}
-            />
-          </div>
           <div className="rbc-time-rows-container">
             {slotMetrics.groups.map((grp, index) => (
               <TimeSlotRow
@@ -183,9 +183,9 @@ const TimeRowGrid = props => {
               />
             ))}
           </div>
-        </div>
-      </DragDropContext>
-    </div>
+        </DragDropContext>
+      </div>
+    </>
   )
 }
 
