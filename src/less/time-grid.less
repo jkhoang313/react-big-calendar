@@ -135,8 +135,20 @@
   z-index: 3;
   left: 0;
   right: 0;
-  height: 1px;
+  height: 2px;
 
   background-color: @current-time-color;
+  pointer-events: none;
+}
+
+.rbc-current-time-dot {
+  z-index: 3;
+  left: -0.5rem;
+  position: absolute;
+  height: 1rem;
+  width: 1rem;
+  border-radius: 50%;
+
+  background-color: $current-time-color;
   pointer-events: none;
 }

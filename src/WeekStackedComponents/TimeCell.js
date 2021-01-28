@@ -69,10 +69,20 @@ const TimeCell = ({
               )
             })}
             {showCurrentTimeIndictator && (
-              <div
-                className="rbc-current-time-indicator"
-                style={{ top: `calc(${(now.getMinutes() / 60) * 100}% - 1px)` }}
-              />
+              <>
+                <div
+                  className="rbc-current-time-indicator"
+                  style={{
+                    top: `calc(${(now.getMinutes() / 60) * 100}% - 1px)`,
+                  }}
+                />
+                <div
+                  className="rbc-current-time-dot"
+                  style={{
+                    top: `calc(${(now.getMinutes() / 60) * 100}% - 0.5rem)`,
+                  }}
+                />
+              </>
             )}
             {provided.placeholder}
           </div>
