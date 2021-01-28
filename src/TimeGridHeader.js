@@ -7,6 +7,7 @@ import Resources from './utils/Resources'
 import DateContentRow from './DateContentRow'
 import ResourceHeader from './ResourceHeader'
 import TimeGridHeaderCells from './TimeGridHeaderCells'
+import ExpandContentRow from './ExpandContentRow'
 
 class TimeGridHeader extends React.Component {
   renderRow = resource => {
@@ -134,29 +135,31 @@ class TimeGridHeader extends React.Component {
                 getDrilldownView={getDrilldownView}
               />
             </div>
-            <DateContentRow
-              isAllDay
-              rtl={rtl}
-              getNow={getNow}
-              minRows={1}
-              range={range}
-              events={groupedEvents.get(id) || []}
-              resourceId={resource && id}
-              className="rbc-allday-cell"
-              selectable={selectable}
-              selected={this.props.selected}
-              components={components}
-              accessors={accessors}
-              getters={getters}
-              localizer={localizer}
-              onSelect={this.props.onSelectEvent}
-              onDoubleClick={this.props.onDoubleClickEvent}
-              onKeyPress={this.props.onKeyPressEvent}
-              onSelectSlot={this.props.onSelectSlot}
-              longPressThreshold={this.props.longPressThreshold}
-              resizable={resizable}
-              dragContainerClass={dragContainerClass}
-            />
+            <ExpandContentRow>
+              <DateContentRow
+                isAllDay
+                rtl={rtl}
+                getNow={getNow}
+                minRows={1}
+                range={range}
+                events={groupedEvents.get(id) || []}
+                resourceId={resource && id}
+                className="rbc-allday-cell"
+                selectable={selectable}
+                selected={this.props.selected}
+                components={components}
+                accessors={accessors}
+                getters={getters}
+                localizer={localizer}
+                onSelect={this.props.onSelectEvent}
+                onDoubleClick={this.props.onDoubleClickEvent}
+                onKeyPress={this.props.onKeyPressEvent}
+                onSelectSlot={this.props.onSelectSlot}
+                longPressThreshold={this.props.longPressThreshold}
+                resizable={resizable}
+                dragContainerClass={dragContainerClass}
+              />
+            </ExpandContentRow>
           </div>
         ))}
       </div>
