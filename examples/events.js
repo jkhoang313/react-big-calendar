@@ -78,8 +78,8 @@ export default [
   {
     id: 11,
     title: 'Birthday Party',
-    start: new Date(2021, 3, 13, 7, 0, 0),
-    end: new Date(2021, 3, 13, 7, 0, 0),
+    start: new Date(2021, 3, 13),
+    end: new Date(2021, 3, 13),
   },
   {
     id: 12,
