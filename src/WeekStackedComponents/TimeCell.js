@@ -3,8 +3,10 @@ import PropTypes from 'prop-types'
 import clsx from 'clsx'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
 
+import { accessor as get } from '../utils/accessors'
 import * as dates from '../utils/dates'
 import { sortEvents } from '../utils/eventLevels'
+import { useCalendarContext } from '../CalendarContext'
 
 const TimeCell = ({
   events,
@@ -17,6 +19,9 @@ const TimeCell = ({
   getters,
   customSorting,
 }) => {
+  const { draggable } = useCalendarContext()
+  const draggableAccessor = draggable && draggable.draggableAccessor
+
   events.sort((a, b) => sortEvents(a, b, accessors, customSorting))
   const userComponentProps = getters.eventComponentProps()
   const showCurrentTimeIndictator = dates.eq(timeSlot, now, 'hours')
@@ -36,6 +41,9 @@ const TimeCell = ({
             {...provided.droppableProps}
           >
             {events.map((event, index) => {
+              const isDraggable = draggableAccessor
+                ? !!get(event, draggableAccessor)
+                : true
               const title = accessors.title(event)
 
               return (
@@ -44,6 +52,7 @@ const TimeCell = ({
                   draggableId={`${accessors.id(event)}`}
                   key={`${accessors.id(event)}`}
                   index={index}
+                  isDragDisabled={!isDraggable}
                 >
                   {provided => {
                     return (
