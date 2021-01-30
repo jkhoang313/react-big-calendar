@@ -54,23 +54,29 @@ const TimeCell = ({
                   index={index}
                   isDragDisabled={!isDraggable}
                 >
-                  {provided => {
+                  {(provided, snapshot) => {
                     return (
                       <div
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
-                        className="rbc-event"
                       >
-                        {Event ? (
-                          <Event
-                            event={event}
-                            title={title}
-                            {...userComponentProps}
-                          />
-                        ) : (
-                          title
-                        )}
+                        <div
+                          className={clsx(
+                            'rbc-event',
+                            snapshot.isDragging && 'rbc-event-is-dragging'
+                          )}
+                        >
+                          {Event ? (
+                            <Event
+                              event={event}
+                              title={title}
+                              {...userComponentProps}
+                            />
+                          ) : (
+                            title
+                          )}
+                        </div>
                       </div>
                     )
                   }}
