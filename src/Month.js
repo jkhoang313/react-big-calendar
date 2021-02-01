@@ -46,6 +46,25 @@ class MonthView extends React.Component {
   }
 
   componentDidMount() {
+    const {
+      accessors,
+      date,
+      events,
+      isInitialMount,
+      localizer,
+      handleInitialCalendarLoad,
+    } = this.props
+
+    if (isInitialMount) {
+      const visibleDates = dates.visibleDays(date, localizer)
+      const firstDate = visibleDates[0]
+      const lastDate = visibleDates[visibleDates.length - 1]
+      const eventsOnLoad = events.filter(e =>
+        inRange(e, firstDate, lastDate, accessors)
+      )
+
+      handleInitialCalendarLoad(eventsOnLoad.length)
+    }
     let running
 
     if (this.state.needLimitMeasure) this.measureRowLimit(this.props)
@@ -431,6 +450,9 @@ MonthView.propTypes = {
     sortPriority: PropTypes.arrayOf(PropTypes.string),
     customComparators: PropTypes.object,
   }),
+
+  isInitialMount: PropTypes.bool,
+  handleInitialCalendarLoad: PropTypes.func.isRequired,
 }
 
 MonthView.range = (date, { localizer }) => {
