@@ -29,10 +29,25 @@ const TimeRowGrid = props => {
     customSorting,
     onDrillDown,
     getDrilldownView,
+    isInitialMount,
+    handleInitialCalendarLoad,
   } = props
   const [now, setNow] = useState(getNow())
   const { draggable } = useCalendarContext()
   const [showFixedHeaders, setShowFixedHeaders] = useState(false)
+
+  useEffect(() => {
+    if (isInitialMount) {
+      const firstDate = range[0]
+      const lastDate = range[range.length - 1]
+      const eventsOnLoad = events.filter(e =>
+        inRange(e, firstDate, lastDate, accessors)
+      )
+
+      handleInitialCalendarLoad(eventsOnLoad.length)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     const currentTimeInterval = window.setInterval(() => {
@@ -224,6 +239,9 @@ TimeRowGrid.propTypes = {
 
   onDrillDown: PropTypes.func,
   getDrilldownView: PropTypes.func.isRequired,
+
+  isInitialMount: PropTypes.bool,
+  handleInitialCalendarLoad: PropTypes.func.isRequired,
 }
 
 export default TimeRowGrid

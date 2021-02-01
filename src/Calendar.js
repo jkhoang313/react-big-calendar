@@ -800,6 +800,13 @@ class Calendar extends React.Component {
       sortPriority: PropTypes.arrayOf(PropTypes.string),
       customComparators: PropTypes.object,
     }),
+
+    /**
+     * Optionally provide a function that is called when
+     * the first view is loaded. Returns the number of events
+     * loaded in the first view
+     */
+    onInitialCalendarLoad: PropTypes.func,
   }
 
   static defaultProps = {
@@ -836,6 +843,7 @@ class Calendar extends React.Component {
     this.calendarRef = React.createRef()
     this.state = {
       context: this.getContext(this.props),
+      isInitialMount: true,
     }
     this.slideRight = false
   }
@@ -1021,6 +1029,7 @@ class Calendar extends React.Component {
       localizer,
       viewNames,
     } = this.state.context
+    const { isInitialMount } = this.state
 
     let CalToolbar = components.toolbar || Toolbar
     const userToolbarProps = getters.toolbarComponentProps()
@@ -1046,6 +1055,8 @@ class Calendar extends React.Component {
         onKeyPressEvent={this.handleKeyPressEvent}
         onSelectSlot={this.handleSelectSlot}
         onShowMore={onShowMore}
+        isInitialMount={isInitialMount}
+        handleInitialCalendarLoad={this.handleInitialCalendarLoad}
       />
     )
 
@@ -1184,6 +1195,12 @@ class Calendar extends React.Component {
     if (view) this.handleViewChange(view)
 
     this.handleNavigate(navigate.DATE, date)
+  }
+
+  handleInitialCalendarLoad = numOfEventsLoaded => {
+    this.setState({ isInitialMount: false })
+    this.props.onInitialCalendarLoad &&
+      this.props.onInitialCalendarLoad(numOfEventsLoaded)
   }
 }
 
