@@ -91,7 +91,15 @@ const TimeRowGrid = props => {
     allDayEvents.sort((a, b) => sortEvents(a, b, accessors, customSorting))
 
     return [allDayEvents, rangeEventsByHour]
-  }, [numTimeSlotRows, events, start, end, accessors, showMultiDayTimes])
+  }, [
+    numTimeSlotRows,
+    events,
+    start,
+    end,
+    accessors,
+    showMultiDayTimes,
+    customSorting,
+  ])
 
   const renderGutter = React.useCallback(
     () => <TimeRowGutter localizer={localizer} />,
