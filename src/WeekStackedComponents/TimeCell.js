@@ -94,7 +94,7 @@ const TimeCell = ({
                 <div
                   className="rbc-current-time-dot"
                   style={{
-                    top: `calc(${(now.getMinutes() / 60) * 100}% - 0.5rem)`,
+                    top: `calc(${(now.getMinutes() / 60) * 100}% - 0.5em)`,
                   }}
                 />
               </>
