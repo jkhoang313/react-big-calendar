@@ -107,15 +107,11 @@ class MonthView extends React.Component {
       weeks = chunk(month, 7)
 
     const scrollableMonth = infiniteScroll || expandRow
-    this._weekCount = weeks.length
 
     const style =
       scrollableMonth && scrollbarSize() > 0
         ? { width: `calc(100% - ${scrollbarSize()}px)` }
         : {}
-
-    const renderWeekWithHeight = (week, weekIdx) =>
-      this.renderWeek(week, weekIdx, weeks.length)
 
     return (
       <div className={clsx('rbc-month-view', className)}>
@@ -139,7 +135,7 @@ class MonthView extends React.Component {
           </div>
           <div className="rbc-month-rows-container">
             <div className="rbc-month-rows-block">
-              {weeks.map(renderWeekWithHeight)}
+              {weeks.map(this.renderWeek)}
             </div>
           </div>
           {this.props.popup && this.renderOverlay()}
@@ -148,7 +144,7 @@ class MonthView extends React.Component {
     )
   }
 
-  renderWeek = (week, weekIdx, numOfWeeks = 5) => {
+  renderWeek = (week, weekIdx) => {
     let {
       events,
       components,
@@ -175,9 +171,6 @@ class MonthView extends React.Component {
     events = eventsForWeek(events, week[0], week[week.length - 1], accessors)
 
     events.sort((a, b) => sortEvents(a, b, accessors, customSorting))
-    const style = {
-      minHeight: `${100 / numOfWeeks}%`,
-    }
 
     const rowContainer = (
       <DateContentRow
@@ -207,7 +200,6 @@ class MonthView extends React.Component {
         rtl={this.props.rtl}
         resizable={this.props.resizable}
         showAllEvents={showAllEvents}
-        style={style}
         renderAllEvents={renderAllEvents}
       />
     )
