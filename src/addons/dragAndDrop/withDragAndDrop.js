@@ -167,11 +167,15 @@ export default function withDragAndDrop(Calendar) {
       }
     }
 
-    handleInteractionStart = (actionOriginalDate = null) => {
+    handleInteractionStart = (
+      actionOriginalDate = null,
+      initialDateRange = null
+    ) => {
       if (this.state.interacting === false) {
         this.setState({
           interacting: true,
           actionOriginalDate,
+          hoveredDateRange: initialDateRange,
         })
       }
     }

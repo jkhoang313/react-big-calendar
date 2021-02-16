@@ -128,6 +128,7 @@ class DateContentRow extends React.Component {
       style,
       renderAllEvents,
       dragContainerClass,
+      weekIdx,
     } = this.props
 
     if (renderForMeasure && !renderAllEvents) return this.renderDummy()
@@ -152,7 +153,7 @@ class DateContentRow extends React.Component {
     }
 
     return (
-      <div className={className} style={style}>
+      <div className={className} style={style} data-row-num={weekIdx}>
         <BackgroundCells
           date={date}
           getNow={getNow}
@@ -190,7 +191,12 @@ class DateContentRow extends React.Component {
               dragContainerClass={dragContainerClass}
             >
               {levels.map((segs, idx) => (
-                <EventRow key={idx} segments={segs} {...eventRowProps} />
+                <EventRow
+                  key={idx}
+                  segments={segs}
+                  {...eventRowProps}
+                  idx={idx}
+                />
               ))}
               {!!extra.length && (
                 <EventEndingRow
@@ -211,6 +217,7 @@ DateContentRow.propTypes = {
   date: PropTypes.instanceOf(Date),
   events: PropTypes.array.isRequired,
   range: PropTypes.array.isRequired,
+  weekIdx: PropTypes.number,
 
   rtl: PropTypes.bool,
   resizable: PropTypes.bool,

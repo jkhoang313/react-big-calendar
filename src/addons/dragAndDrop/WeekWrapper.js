@@ -331,11 +331,12 @@ class WeekWrapper extends React.Component {
     selector.on('beforeSelect', point => {
       const { isAllDay } = this.props
       const { action } = this.context.draggable.dragAndDropAction
+      // console.log('old', action)
 
       return (
-        action === 'move' ||
-        (action === 'resize' &&
-          (!isAllDay || pointInBox(getBoundsForNode(node), point)))
+        // action === 'move' ||
+        action === 'resize' &&
+        (!isAllDay || pointInBox(getBoundsForNode(node), point))
       )
     })
 

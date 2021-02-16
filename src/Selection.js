@@ -257,6 +257,7 @@ class Selection {
 
       if (!collides) return
     }
+    // console.log(result)
 
     let result = this.emit(
       'beforeSelect',

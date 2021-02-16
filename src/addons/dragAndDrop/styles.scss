@@ -1,6 +1,14 @@
 @import '../../sass/variables';
 
 .rbc-addons-dnd {
+  &.rbc-addons-dnd-is-moving {
+    cursor: grabbing;
+  }
+
+  &.rbc-addons-dnd-is-resizing {
+    cursor: grabbing;
+  }
+
   .rbc-addons-dnd-row-body {
     position: relative;
   }
@@ -30,7 +38,8 @@
   }
 
   .rbc-addons-dnd-dragged-event {
-    opacity: 0;
+    // opacity: 0;
+    pointer-events: none;
   }
 
   &.rbc-addons-dnd-is-dragging .rbc-event:not(.rbc-addons-dnd-dragged-event):not(.rbc-addons-dnd-drag-preview) {

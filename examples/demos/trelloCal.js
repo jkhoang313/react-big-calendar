@@ -78,7 +78,7 @@ class TrelloCal extends React.Component {
         resizable
         onEventResize={this.resizeEvent}
         views={[Views.MONTH, Views.WEEK]}
-        defaultView={Views.WEEK}
+        // defaultView={Views.WEEK}
         expandRow
         messages={{
           showMore: count => {

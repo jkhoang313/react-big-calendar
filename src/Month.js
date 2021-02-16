@@ -8,6 +8,7 @@ import chunk from 'lodash/chunk'
 
 import { navigate, views } from './utils/constants'
 import { notify } from './utils/helpers'
+import { accessor } from './utils/propTypes'
 import { handleScrollingHeader } from './utils/scrolling'
 import getPosition from 'dom-helpers/position'
 import * as animationFrame from 'dom-helpers/animationFrame'
@@ -19,6 +20,7 @@ import DateContentRow from './DateContentRow'
 import ExpandContentRow from './ExpandContentRow'
 import Header from './Header'
 import DateHeader from './DateHeader'
+import ViewWrapper from './addons/dragAndDrop/ViewWrapper'
 
 import { inRange, sortEvents } from './utils/eventLevels'
 
@@ -26,6 +28,18 @@ let eventsForWeek = (evts, start, end, accessors) =>
   evts.filter(e => inRange(e, start, end, accessors))
 
 class MonthView extends React.Component {
+  static contextTypes = {
+    draggable: PropTypes.shape({
+      onStart: PropTypes.func,
+      onEnd: PropTypes.func,
+      onBeginAction: PropTypes.func,
+      draggableAccessor: accessor,
+      resizableAccessor: accessor,
+      dragAndDropAction: PropTypes.object,
+      onEventChange: PropTypes.func,
+    }),
+  }
+
   constructor(...args) {
     super(...args)
 
@@ -102,7 +116,14 @@ class MonthView extends React.Component {
   }
 
   render() {
-    let { date, localizer, className, infiniteScroll, expandRow } = this.props,
+    let {
+        date,
+        localizer,
+        className,
+        infiniteScroll,
+        expandRow,
+        accessors,
+      } = this.props,
       month = dates.visibleDays(date, localizer),
       weeks = chunk(month, 7)
 
@@ -114,7 +135,13 @@ class MonthView extends React.Component {
         : {}
 
     return (
-      <div className={clsx('rbc-month-view', className)}>
+      <ViewWrapper
+        className={clsx('rbc-month-view', className)}
+        weeks={weeks}
+        slotNum={7}
+        accessors={accessors}
+      >
+        {/* <div className={clsx('rbc-month-view', className)}> */}
         <div
           className={clsx('rbc-row rbc-month-header rbc-fixed-header', {
             'show-header': this.state.showFixedHeaders,
@@ -140,7 +167,8 @@ class MonthView extends React.Component {
           </div>
           {this.props.popup && this.renderOverlay()}
         </div>
-      </div>
+        {/* </div> */}
+      </ViewWrapper>
     )
   }
 
@@ -161,6 +189,7 @@ class MonthView extends React.Component {
       expandRow,
       customSorting,
     } = this.props
+    const { actionOriginalDate } = this.context.draggable.dragAndDropAction
 
     const flexibleRowHeight = infiniteScroll || expandRow
 
@@ -175,6 +204,7 @@ class MonthView extends React.Component {
     const rowContainer = (
       <DateContentRow
         key={weekIdx}
+        weekIdx={weekIdx}
         ref={weekIdx === 0 ? this.slotRowRef : undefined}
         container={this.getContainer}
         className="rbc-month-row rbc-month-row-full"
@@ -201,6 +231,12 @@ class MonthView extends React.Component {
         resizable={this.props.resizable}
         showAllEvents={showAllEvents}
         renderAllEvents={renderAllEvents}
+        style={
+          actionOriginalDate &&
+          dates.inRange(actionOriginalDate, week[0], week[6])
+            ? { zIndex: 100 }
+            : null
+        }
       />
     )
 

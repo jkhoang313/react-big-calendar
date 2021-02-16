@@ -4,6 +4,8 @@ import clsx from 'clsx'
 import { accessor } from '../../utils/propTypes'
 import { accessor as get } from '../../utils/accessors'
 
+import { MousePositionContext } from './MousePositionContext'
+
 class EventWrapper extends React.Component {
   static contextTypes = {
     draggable: PropTypes.shape({
@@ -14,6 +16,13 @@ class EventWrapper extends React.Component {
       resizableAccessor: accessor,
       dragAndDropAction: PropTypes.object,
       onEventChange: PropTypes.func,
+    }),
+    mousePosition: PropTypes.shape({
+      x: PropTypes.number,
+      y: PropTypes.number,
+      deltaX: PropTypes.number,
+      deltaY: PropTypes.number,
+      currentSlot: PropTypes.instanceOf(Date),
     }),
   }
 
@@ -80,8 +89,9 @@ class EventWrapper extends React.Component {
 
     let { children } = this.props
 
-    const { draggable } = this.context
+    const { draggable, mousePosition } = this.context
     const { draggableAccessor, resizableAccessor } = draggable
+    const { deltaX, deltaY } = mousePosition
 
     const isDraggable = draggableAccessor
       ? !!get(event, draggableAccessor)
@@ -170,6 +180,12 @@ class EventWrapper extends React.Component {
           children.props.className,
           'rbc-addons-dnd-dragged-event'
         )
+        if (deltaX || deltaY) {
+          newProps.style = {
+            ...children.props.style,
+            transform: `translate(${deltaX}px, ${deltaY}px)`,
+          }
+        }
       }
 
       children = React.cloneElement(children, newProps)
